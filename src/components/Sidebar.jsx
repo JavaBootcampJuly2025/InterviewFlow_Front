@@ -7,7 +7,7 @@ export default function Sidebar() {
         <aside className="sidebar">
             <nav>
                 <NavLink
-                    to="/"
+                    to="/Dashboard"
                     className={({ isActive }) =>
                         isActive ? 'sidebar__link sidebar__link--active' : 'sidebar__link'
                     }

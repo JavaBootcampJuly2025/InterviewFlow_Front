@@ -1,17 +1,18 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout.jsx';
-import DashboardPage from './pages/DashboardPage.jsx'; // adjust path if needed
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
-    return (
-        <Router>
-            <Layout>
-                <Routes>
-                    <Route path="/" element={<DashboardPage />} />
-                </Routes>
-            </Layout>
-        </Router>
-    );
+  return (
+    <Router>
+      <Routes>
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App;
+export default App

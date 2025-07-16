@@ -1,17 +1,18 @@
 import React from 'react';
-import Button from './Button.jsx';
-import './Layout.css';
+import { Typography } from '@mui/material';
+import MuiButton from '@mui/material/Button';
 
-export default function Header() {
+const Header = ({ user, handleLogout }) => {
     return (
-        <header className="header">
-            <div>Job Interview Tracker</div>
-            <Button
-                onClick={() => alert('Logging out...')}
-                variant="primary"
-            >
-                Log out
-            </Button>
-        </header>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem' }}>
+            <Typography variant="h5" gutterBottom>
+                Welcome, {user?.userName || 'User'}!
+            </Typography>
+            <MuiButton variant="outlined" color="secondary" onClick={handleLogout}>
+                Logout
+            </MuiButton>
+        </div>
     );
-}
+};
+
+export default Header;
