@@ -1,7 +1,3 @@
-export function formatForDateTimeLocal(isoString) {
-    if (!isoString) return '';
-    return isoString.substring(0, 16);
-}
 
 export function toLocalDateTimeString(date) {
     if (!date) return '';

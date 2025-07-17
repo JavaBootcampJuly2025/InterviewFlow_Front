@@ -1,10 +1,6 @@
 import { ApplicationStatus } from '../types/applicationStatus.js';
 import { ValidationError } from './ValidationError.js';
 
-/**
- * Validates a single application.
- * Returns an object with errors per field, or empty object if no errors.
- */
 export function validateApplication(application) {
     const errors = {};
 
@@ -45,11 +41,6 @@ export function validateApplication(application) {
     return errors;
 }
 
-/**
- * Validates an array of applications.
- * Throws ValidationError with combined error messages if any errors found.
- * Returns data if all applications are valid.
- */
 export function validateApplications(data) {
     if (!Array.isArray(data)) {
         throw new ValidationError('Job data is not an array');

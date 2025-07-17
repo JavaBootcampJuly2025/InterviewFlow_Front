@@ -6,7 +6,7 @@ import { toLocalDateTimeString } from '../utlis/date.js';
 import Button from './Button.jsx';
 import { validateApplication } from '../utlis/validateApplications.js';
 
-export default function ApplicationEditForm({ job, onClose, onUpdateJob, formatForDateTimeLocal, isNew = false }) {
+export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew = false }) {
     const [formData, setFormData] = useState(() => ({
         id: job?.id || null,
         company_name: job?.company_name || '',

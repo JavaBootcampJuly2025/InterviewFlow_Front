@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button as MuiButton, Typography } from '@mui/material';
 import StatusBadge from '../components/StatusBadge.jsx';
 import './Dashboard.css';
 import { mockJobApplications } from '../mockData.js';
 import { validateApplications } from '../utlis/validateApplications.js';
-import 'react-datepicker/dist/react-datepicker.css';
 import ApplicationEditForm from '../components/ApplicationEditForm.jsx';
 import Button from '../components/Button.jsx';
 import Layout from '../components/Layout.jsx';
@@ -46,9 +44,9 @@ export default function DashboardPage({ setUser }) {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        navigate("/login");
+        localStorage.removeItem("user");
         setUser(null);
-        navigate('/login');
     };
 
     function updateJobInList(updatedJob) {
