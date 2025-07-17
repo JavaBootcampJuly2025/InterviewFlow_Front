@@ -1,5 +1,20 @@
 import { ApplicationStatus } from '../types/applicationStatus.js';
 import { ValidationError } from './ValidationError.js';
+import isURL from 'validator/lib/isURL';
+
+export function validateUrl(url) {
+    if (typeof url !== 'string' || !url.trim()) {
+        return 'URL must be a non-empty string';
+    }
+
+    const normalized = url.trim();
+
+    if (!isURL(normalized, { require_protocol: true })) {
+        return 'Invalid URL. Must start with http:// or https://';
+    }
+
+    return null;
+}
 
 export function validateApplication(application) {
     const errors = {};
@@ -15,27 +30,27 @@ export function validateApplication(application) {
         errors.status = `Unknown status "${application.status}"`;
     }
 
-    if (!application.company_name || typeof application.company_name !== 'string' || !application.company_name.trim()) {
-        errors.company_name = 'Missing or invalid company name';
+    if (!application.companyName || typeof application.companyName !== 'string' || !application.companyName.trim()) {
+        errors.companyName = 'Missing or invalid company name';
     }
 
     if (!application.position || typeof application.position !== 'string' || !application.position.trim()) {
         errors.position = 'Missing or invalid position';
     }
 
-    if (application.company_link && typeof application.company_link === 'string' && application.company_link.trim()) {
-        const urlPattern = /^(https?:\/\/)?([\w.-]+)+(:\d+)?(\/.*)?$/;
-        if (!urlPattern.test(application.company_link)) {
-            errors.company_link = 'Invalid company link URL';
+    if (application.companyLink) {
+        const urlError = validateUrl(application.companyLink);
+        if (urlError) {
+            errors.companyLink = urlError;
         }
     }
 
-    if (application.created_at && isNaN(Date.parse(application.created_at))) {
-        errors.created_at = 'Invalid created_at date';
+    if (application.createdAt && isNaN(Date.parse(application.createdAt))) {
+        errors.createdAt = 'Invalid createdAt date';
     }
 
-    if (application.updated_at && isNaN(Date.parse(application.updated_at))) {
-        errors.updated_at = 'Invalid updated_at date';
+    if (application.updatedAt && isNaN(Date.parse(application.updatedAt))) {
+        errors.updatedAt = 'Invalid updatedAt date';
     }
 
     return errors;
