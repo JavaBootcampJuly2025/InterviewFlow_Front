@@ -2,22 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../components/StatusBadge.jsx';
 import './Dashboard.css';
-import { mockJobApplications } from '../mockData.js';
-import { validateApplications } from '../utlis/validateApplications.js';
 import ApplicationEditForm from '../components/ApplicationEditForm.jsx';
 import Button from '../components/Button.jsx';
 import Layout from '../components/Layout.jsx';
+import { validateUrl } from '../utlis/validateApplications.js';
+import { formatDateTimeLocal } from '../utlis/date.js';
 
-export default function DashboardPage({ setUser }) {
+export default function DashboardPage() {
     const navigate = useNavigate();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState([]);
     const [expandedJobId, setExpandedJobId] = useState(null);
     const [addingJob, setAddingJob] = useState(false);
-    const user = JSON.parse(localStorage.getItem('user'));
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
 
-    // Redirect to login if not logged in
     useEffect(() => {
         if (!user) {
             navigate('/login');
@@ -25,22 +24,23 @@ export default function DashboardPage({ setUser }) {
     }, [user, navigate]);
 
     useEffect(() => {
-        (async () => {
-            setLoading(true);
-            setErrors([]);
-            try {
-                await new Promise((resolve) => setTimeout(resolve, 500));
-                const data = mockJobApplications;
-                const validJobs = validateApplications(data);
-                setJobs(validJobs);
-            } catch (err) {
-                const newMsg = err.message || 'Unknown error';
-                setErrors((prev) => (prev.includes(newMsg) ? prev : [...prev, newMsg]));
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        })();
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (!userData) return;
+
+        setUser(userData);
+
+        fetch(`http://localhost:8080/api/users/${userData.id}/applications`, {
+            credentials: 'include',
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch applications: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => setJobs(data))
+            .catch((err) => console.error('Error loading applications:', err))
+            .finally(() => setLoading(false));
     }, []);
 
     const handleLogout = () => {
@@ -57,9 +57,8 @@ export default function DashboardPage({ setUser }) {
         setJobs((prevJobs) => [newJob, ...prevJobs]);
     }
 
-    function formatForDateTimeLocal(isoString) {
-        if (!isoString) return '';
-        return isoString.substring(0, 16);
+    function removeJobFromList(deletedId) {
+        setJobs((prevJobs) => prevJobs.filter((job) => job.id !== deletedId));
     }
 
     if (loading) {
@@ -103,12 +102,12 @@ export default function DashboardPage({ setUser }) {
                         <h3>New Job Application</h3>
                         <ApplicationEditForm
                             job={null}
+                            userId={user?.id}
                             onClose={() => setAddingJob(false)}
                             onUpdateJob={(newJob) => {
                                 addNewJob(newJob);
                                 setAddingJob(false);
                             }}
-                            formatForDateTimeLocal={formatForDateTimeLocal}
                             isNew
                         />
                     </div>
@@ -129,12 +128,12 @@ export default function DashboardPage({ setUser }) {
                         <React.Fragment key={job.id}>
                             <tr>
                                 <td>
-                                    {job.company_link ? (
-                                        <a href={job.company_link} target="_blank" rel="noopener noreferrer">
-                                            {job.company_name}
+                                    {validateUrl(job.companyLink) === null ? (
+                                        <a href={job.companyLink} target="_blank" rel="noopener noreferrer">
+                                            {job.companyName}
                                         </a>
                                     ) : (
-                                        job.company_name
+                                        job.companyName
                                     )}
                                 </td>
                                 <td>{job.position}</td>
@@ -142,8 +141,8 @@ export default function DashboardPage({ setUser }) {
                                     <StatusBadge status={job.status} />
                                 </td>
                                 <td>
-                                    {job.created_at
-                                        ? new Date(job.created_at).toLocaleDateString(undefined, {
+                                    {job.createdAt
+                                        ? new Date(job.createdAt).toLocaleDateString(undefined, {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric',
@@ -165,8 +164,15 @@ export default function DashboardPage({ setUser }) {
                                         <ApplicationEditForm
                                             job={job}
                                             onClose={() => setExpandedJobId(null)}
-                                            onUpdateJob={updateJobInList}
-                                            formatForDateTimeLocal={formatForDateTimeLocal}
+                                            onUpdateJob={(updated) => {
+                                                if (updated.deleted) {
+                                                    removeJobFromList(updated.id);
+                                                } else {
+                                                    updateJobInList(updated);
+                                                }
+                                                setExpandedJobId(null);
+                                            }}
+                                            formatForDateTimeLocal={formatDateTimeLocal}
                                         />
                                     </td>
                                 </tr>

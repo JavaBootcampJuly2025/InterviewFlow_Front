@@ -1,12 +1,14 @@
+export function formatDateTimeLocal(isoString) {
+    if (!isoString) return '';
 
-export function toLocalDateTimeString(date) {
-    if (!date) return '';
+    const date = new Date(isoString); // UTC or local ISO string
+    const tzOffset = date.getTimezoneOffset() * 60000; // in milliseconds
+    const localISOTime = new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
 
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return localISOTime;
+}
 
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+export function toUTCISOString(localString) {
+    const localDate = new Date(localString);
+    return new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000).toISOString();
 }

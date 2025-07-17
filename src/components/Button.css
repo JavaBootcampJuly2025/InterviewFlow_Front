@@ -18,6 +18,10 @@
     background-color: #5c4dff;
 }
 
+.my-button.danger {
+    background-color: red;
+}
+
 .my-button.primary:hover:not(:disabled) {
     background-color: #4a3bc1;
 }

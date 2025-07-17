@@ -2,19 +2,20 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { ApplicationStatus } from '../types/applicationStatus.js';
 import { statusColors } from './StatusBadge.jsx';
-import { toLocalDateTimeString } from '../utlis/date.js';
+import { formatDateTimeLocal } from '../utlis/date.js';
+import { toUTCISOString } from '../utlis/date.js';
 import Button from './Button.jsx';
 import { validateApplication } from '../utlis/validateApplications.js';
 
 export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew = false }) {
     const [formData, setFormData] = useState(() => ({
         id: job?.id || null,
-        company_name: job?.company_name || '',
-        company_link: job?.company_link || '',
+        companyName: job?.companyName || '',
+        companyLink: job?.companyLink || '',
         position: job?.position || '',
         status: job?.status || 'APPLIED',
-        created_at: job?.created_at || new Date().toISOString().substring(0, 16),
-        updated_at: job?.updated_at || new Date().toISOString().substring(0, 16),
+        createdAt: formatDateTimeLocal(job?.createdAt || new Date()),
+        updatedAt: formatDateTimeLocal(job?.updatedAt || new Date()),
     }));
 
     const [errors, setErrors] = useState({});
@@ -26,6 +27,33 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
         setErrors(validateApplication(updatedForm));
     };
 
+    const handleDelete = async () => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this job application?');
+        if (!confirmDelete) return;
+
+        try {
+            setIsSaving(true);
+
+            const response = await fetch(`http://localhost:8080/api/applications/${formData.id}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete: ${response.status}`);
+            }
+
+            alert('Job deleted successfully!');
+            onUpdateJob({ ...formData, deleted: true });
+            onClose();
+        } catch (error) {
+            console.error('Delete failed:', error);
+            alert('Failed to delete job. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const handleSubmit = async () => {
         const validationErrors = validateApplication(formData);
         setErrors(validationErrors);
@@ -34,16 +62,47 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
 
         try {
             setIsSaving(true);
-            const id = isNew ? Date.now() : formData.id;
-            const updatedJob = { ...formData, id, updated_at: toLocalDateTimeString(new Date()) };
 
-            await new Promise(res => setTimeout(res, 500)); // simulate API delay
-            onUpdateJob(updatedJob);
-            alert(isNew ? 'Job added successfully! (mock)' : 'Job updated successfully! (mock)');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+            const payload = {
+                companyName: formData.companyName,
+                companyLink: formData.companyLink,
+                position: formData.position,
+                status: formData.status,
+                userId: user.id,
+            };
+
+            let response;
+
+            if (formData.id) {
+                response = await fetch(`http://localhost:8080/api/applications/${formData.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload),
+                });
+            } else {
+                response = await fetch('http://localhost:8080/api/applications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload),
+                });
+            }
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `Server responded with ${response.status}`);
+            }
+
+            const result = await response.json();
+            onUpdateJob(result);
+            alert(formData.id ? 'Job updated successfully!' : 'Job added successfully!');
             onClose();
         } catch (error) {
-            console.error(error);
-            alert('Error saving job data');
+            console.error('Save failed:', error);
+            alert('Failed to save job: ' + error.message);
         } finally {
             setIsSaving(false);
         }
@@ -86,11 +145,15 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
                 {errors.status && <p className="error">{errors.status}</p>}
             </div>
 
-            {renderInput('Company Name', 'company_name')}
-            {renderInput('Company Link', 'company_link', 'url', false, 255)}
+            {renderInput('Company Name', 'companyName')}
+            {renderInput('Company Link', 'companyLink', 'url', false, 255)}
             {renderInput('Position', 'position', 'text', false, 255)}
-            {renderInput('Created At', 'created_at', 'datetime-local', true)}
-            {renderInput('Updated At', 'updated_at', 'datetime-local', true)}
+            {!isNew && (
+                <>
+                    {renderInput('Created At', 'createdAt', 'datetime-local', true)}
+                    {renderInput('Updated At', 'updatedAt', 'datetime-local', true)}
+                </>
+            )}
 
             <div>
                 <Button
@@ -101,6 +164,11 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
                     {isSaving ? 'Saving...' : isNew ? 'Add Job' : 'Save'}
                 </Button>
                 <Button variant="primary" onClick={onClose}>Close</Button>
+                {!isNew && (
+                    <Button variant="danger" onClick={handleDelete}>
+                        Delete
+                    </Button>
+                )}
             </div>
         </div>
     );
@@ -109,15 +177,15 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
 ApplicationEditForm.propTypes = {
     job: PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        company_name: PropTypes.string,
-        company_link: PropTypes.string,
+        companyName: PropTypes.string,
+        companyLink: PropTypes.string,
         position: PropTypes.string,
         status: PropTypes.string,
-        created_at: PropTypes.string,
-        updated_at: PropTypes.string,
+        createdAt: PropTypes.string,
+        updatedAt: PropTypes.string,
     }),
     onClose: PropTypes.func.isRequired,
     onUpdateJob: PropTypes.func.isRequired,
-    formatForDateTimeLocal: PropTypes.func.isRequired,
     isNew: PropTypes.bool,
+    userId: PropTypes.number,
 };
