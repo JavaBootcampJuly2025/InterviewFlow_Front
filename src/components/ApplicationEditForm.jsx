@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { ApplicationStatus } from '../types/applicationStatus.js';
 import { statusColors } from './StatusBadge.jsx';
 import { formatDateTimeLocal } from '../utlis/date.js';
-import { toUTCISOString } from '../utlis/date.js';
-import Button from './Button.jsx';
+import Button from '@mui/material/Button';
+import { Typography } from '@mui/material';
 import { validateApplication } from '../utlis/validateApplications.js';
 
 export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew = false }) {
@@ -70,19 +70,19 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
                 companyLink: formData.companyLink,
                 position: formData.position,
                 status: formData.status,
-                userId: user.id,
             };
 
             let response;
 
             if (formData.id) {
                 response = await fetch(`http://localhost:8080/api/applications/${formData.id}`, {
-                    method: 'PUT',
+                    method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify(payload),
                 });
             } else {
+                payload.userId = user.id;
                 response = await fetch('http://localhost:8080/api/applications', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -127,14 +127,24 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
 
     return (
         <div className="job-edit-form">
-            <div>
-                <label htmlFor="status-select">Status</label>
+            <div style={{ marginBottom: '1rem' }}>
+                <Typography variant="subtitle1" component="label" htmlFor="status-select" gutterBottom>
+                    Status
+                </Typography>
+
                 <select
                     id="status-select"
                     name="status"
                     value={formData.status}
                     onChange={handleFieldChange}
-                    style={{ backgroundColor: statusColors[formData.status] || 'white', color: 'black' }}
+                    style={{
+                        backgroundColor: statusColors[formData.status] || 'white',
+                        color: 'black',
+                        padding: '0.5rem',
+                        borderRadius: '4px',
+                        width: '100%',
+                        marginTop: '0.25rem',
+                    }}
                 >
                     {Object.values(ApplicationStatus).map((status) => (
                         <option key={status} value={status}>
@@ -142,12 +152,18 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
                         </option>
                     ))}
                 </select>
-                {errors.status && <p className="error">{errors.status}</p>}
+
+                {errors.status && (
+                    <Typography variant="body2" color="error" sx={{ marginTop: '0.25rem' }}>
+                        {errors.status}
+                    </Typography>
+                )}
             </div>
 
             {renderInput('Company Name', 'companyName')}
             {renderInput('Company Link', 'companyLink', 'url', false, 255)}
             {renderInput('Position', 'position', 'text', false, 255)}
+
             {!isNew && (
                 <>
                     {renderInput('Created At', 'createdAt', 'datetime-local', true)}
@@ -155,17 +171,22 @@ export default function ApplicationEditForm({ job, onClose, onUpdateJob, isNew =
                 </>
             )}
 
-            <div>
+            <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 <Button
-                    variant="primary"
+                    variant="contained"
+                    color="primary"
                     onClick={handleSubmit}
                     disabled={Object.keys(errors).length > 0 || isSaving}
                 >
                     {isSaving ? 'Saving...' : isNew ? 'Add Job' : 'Save'}
                 </Button>
-                <Button variant="primary" onClick={onClose}>Close</Button>
+
+                <Button variant="outlined" onClick={onClose}>
+                    Close
+                </Button>
+
                 {!isNew && (
-                    <Button variant="danger" onClick={handleDelete}>
+                    <Button variant="outlined" color="error" onClick={handleDelete}>
                         Delete
                     </Button>
                 )}

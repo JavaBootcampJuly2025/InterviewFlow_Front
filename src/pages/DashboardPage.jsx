@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../components/StatusBadge.jsx';
 import './Dashboard.css';
 import ApplicationEditForm from '../components/ApplicationEditForm.jsx';
-import Button from '../components/Button.jsx';
+import Button from '@mui/material/Button';
+import { Typography } from '@mui/material';
 import Layout from '../components/Layout.jsx';
 import { validateUrl } from '../utlis/validateApplications.js';
 import { formatDateTimeLocal } from '../utlis/date.js';
@@ -92,14 +93,26 @@ export default function DashboardPage() {
     return (
         <Layout user={user} handleLogout={handleLogout}>
             <div className="dashboard-container">
-                <h1>Dashboard</h1>
-                <Button variant="primary" onClick={() => setAddingJob(true)}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Dashboard
+                </Typography>
+
+                <Button variant="contained" color="primary" onClick={() => setAddingJob(true)}>
                     Add Job
                 </Button>
 
                 {addingJob && (
-                    <div style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '1rem', borderRadius: '6px' }}>
-                        <h3>New Job Application</h3>
+                    <div
+                        style={{
+                            marginBottom: '1rem',
+                            border: '1px solid #ccc',
+                            padding: '1rem',
+                            borderRadius: '6px',
+                        }}
+                    >
+                        <Typography variant="h6" component="h2" gutterBottom>
+                            New Job Application
+                        </Typography>
                         <ApplicationEditForm
                             job={null}
                             userId={user?.id}
@@ -151,8 +164,11 @@ export default function DashboardPage() {
                                 </td>
                                 <td>
                                     <Button
-                                        variant="primary"
-                                        onClick={() => setExpandedJobId(job.id === expandedJobId ? null : job.id)}
+                                        variant="outlined"
+                                        color="secondary"
+                                        onClick={() =>
+                                            setExpandedJobId(job.id === expandedJobId ? null : job.id)
+                                        }
                                     >
                                         {job.id === expandedJobId ? 'Close' : 'Edit'}
                                     </Button>

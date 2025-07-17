@@ -1,6 +1,5 @@
 import React from 'react';
-import { Typography } from '@mui/material';
-import MuiButton from '@mui/material/Button';
+import { Typography, Button } from '@mui/material';
 
 const Header = ({ user, handleLogout }) => {
     return (
@@ -8,9 +7,14 @@ const Header = ({ user, handleLogout }) => {
             <Typography variant="h5" gutterBottom>
                 Welcome, {user?.userName || 'User'}!
             </Typography>
-            <MuiButton variant="outlined" color="secondary" onClick={handleLogout}>
+            <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleLogout}
+                sx={{ mr: 4 }} // <-- adds left margin
+            >
                 Logout
-            </MuiButton>
+            </Button>
         </div>
     );
 };
