@@ -13,6 +13,18 @@ export function Header({ isAuthenticated, onLogout }: HeaderProps) {
 
   const currentPath = location.pathname;
 
+  const navBtnBase =
+    "relative before:content-[''] before:absolute before:left-0 before:-bottom-1 before:h-0.5 before:bg-primary before:transition-all before:duration-300";
+  const navBtnHover = "hover:before:w-full";
+  const navBtnActive = "before:w-full";
+
+  const navBtnClass = (path: string, extraActivePaths: string[] = []) =>
+    [
+      navBtnBase,
+      (currentPath === path || extraActivePaths.includes(currentPath)) ? navBtnActive : "before:w-0",
+      navBtnHover,
+    ].join(" ");
+
   return (
     <header className="border-b bg-white/80 backdrop-blur-lg shadow-sm">
       <div className="container mx-auto px-4 py-4">
@@ -31,19 +43,22 @@ export function Header({ isAuthenticated, onLogout }: HeaderProps) {
             {!isAuthenticated ? (
               <>
                 <Button
-                  variant={currentPath === '/' ? 'default' : 'ghost'}
+                  className={navBtnClass('/')}
+                  variant="ghost"
                   onClick={() => navigate('/')}
                 >
                   Home
                 </Button>
                 <Button
-                  variant={currentPath === '/login' ? 'default' : 'ghost'}
+                  className={navBtnClass('/login')}
+                  variant="ghost"
                   onClick={() => navigate('/login')}
                 >
                   Login
                 </Button>
                 <Button
-                  variant={currentPath === '/register' ? 'default' : 'outline'}
+                  className={navBtnClass('/register')}
+                  variant="ghost"
                   onClick={() => navigate('/register')}
                 >
                   Sign Up
@@ -52,19 +67,25 @@ export function Header({ isAuthenticated, onLogout }: HeaderProps) {
             ) : (
               <>
                 <Button
-                  variant={currentPath === '/dashboard' ? 'default' : 'ghost'}
+                  className={navBtnClass('/dashboard', ['/'])}
+                  variant="ghost"
                   onClick={() => navigate('/dashboard')}
                 >
                   Dashboard
                 </Button>
                 <Button
-                  variant={currentPath === '/profile' ? 'default' : 'ghost'}
+                  className={navBtnClass('/profile')}
+                  variant="ghost"
                   onClick={() => navigate('/profile')}
                 >
                   <SettingsIcon className="h-4 w-4 mr-2" />
                   Profile
                 </Button>
-                <Button variant="ghost" onClick={onLogout}>
+                <Button
+                  className={navBtnBase + " " + navBtnHover + " before:w-0"}
+                  variant="ghost"
+                  onClick={onLogout}
+                >
                   <UserIcon className="h-4 w-4 mr-2" />
                   Logout
                 </Button>

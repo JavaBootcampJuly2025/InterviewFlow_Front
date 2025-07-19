@@ -6,6 +6,7 @@ import { RegistrationPage } from "./components/RegistrationPage";
 import { Dashboard } from "./components/Dashboard";
 import { ProfilePage } from "./components/ProfilePage";
 import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import "./components/globals.css";
 import type { ReactElement } from "react";
@@ -44,16 +45,23 @@ export default function App() {
 
   return (
     <Router>
-      <div className="min-h-screen relative">
+      <div className="min-h-screen relative flex flex-col">
         <AnimatedBackground />
-        <div className="relative z-10">
+        <div className="relative z-10 flex flex-col min-h-screen">
           <Header
             isAuthenticated={isAuthenticated}
             onLogout={handleLogout}
           />
-          <main className="container mx-auto px-4 py-8">
+          <main className="container mx-auto px-4 py-8 flex-1">
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              {!isAuthenticated ? (<Route path="/" element={<HomePage />} />) : (<Route
+                path="/"
+                element={
+                  <PrivateRoute isAuthenticated={isAuthenticated}>
+                    <Dashboard user={user} />
+                  </PrivateRoute>
+                }
+              />)}
               <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
               <Route path="/register" element={<RegistrationPage onLogin={handleLogin} />} />
               <Route
@@ -75,6 +83,7 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </main>
+          <Footer />
         </div>
       </div>
     </Router>

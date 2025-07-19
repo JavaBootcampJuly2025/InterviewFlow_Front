@@ -57,7 +57,7 @@ export function HomePage() {
           </Button>
           <Button
             size="lg"
-            variant="outline"
+            variant="secondary"
             onClick={() => navigate("/login")}
           >
             Sign In
