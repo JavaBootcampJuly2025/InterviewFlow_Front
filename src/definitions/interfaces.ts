@@ -12,7 +12,7 @@ export interface Application {
   emailNotifications?: boolean;
 }
 
-export type ApplicationStatus = "applied" | "interview" | "offer" | "rejected";
+export type ApplicationStatus = "applied" | "HR Interview" | "Technical Interview" | "Final Interview" | "offer" |  "accepted" | "rejected";
 
 export interface ApplicationFormData {
   company: string;

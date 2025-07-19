@@ -31,7 +31,7 @@ export function ApplicationList({
 }: ApplicationListProps) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="mt-3 pb-1">
         <CardTitle>Recent Applications</CardTitle>
         <CardDescription>
           Track and manage your job applications

@@ -15,6 +15,7 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
+import { useIsTablet } from "../ui/use-mobile";
 
 interface StatisticsProps {
   stats: {
@@ -26,6 +27,7 @@ interface StatisticsProps {
   };
 }
 
+
 export function Statistics({ stats }: StatisticsProps) {
   const chartData = [
     { name: "Applied", value: stats.applied, color: "#3b82f6" },
@@ -34,9 +36,11 @@ export function Statistics({ stats }: StatisticsProps) {
     { name: "Rejected", value: stats.rejected, color: "#ef4444" },
   ].filter((item) => item.value > 0);
 
+  const isTablet = useIsTablet();
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="mt-3 pb-1">
         <CardTitle className="flex items-center space-x-2">
           <BarChart3Icon className="h-5 w-5" />
           <span>Application Statistics</span>
@@ -49,7 +53,7 @@ export function Statistics({ stats }: StatisticsProps) {
         <div className="grid md:grid-cols-2 gap-8">
           <div>
             <h3 className="mb-4">Status Distribution</h3>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={320}>
               <PieChart>
                 <Pie
                   data={chartData}
@@ -59,9 +63,10 @@ export function Statistics({ stats }: StatisticsProps) {
                   label={({ name, percent }) =>
                     `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
                   }
-                  outerRadius={80}
+                  outerRadius={isTablet ? 70 : 90}
                   fill="#8884d8"
                   dataKey="value"
+                  className={isTablet ? "text-xs" : "text-sm"}
                 >
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -97,8 +102,8 @@ export function Statistics({ stats }: StatisticsProps) {
                 <span className="font-semibold">
                   {stats.total > 0
                     ? Math.round(
-                        ((stats.offers + stats.interviews) / stats.total) * 100
-                      )
+                      ((stats.offers + stats.interviews) / stats.total) * 100
+                    )
                     : 0}
                   %
                 </span>

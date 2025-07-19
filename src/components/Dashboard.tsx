@@ -51,8 +51,11 @@ export function Dashboard({ user }: DashboardProps) {
   const mapStatusToBackend = (frontendStatus: ApplicationStatus): string => {
     const statusMap: Record<ApplicationStatus, string> = {
       'applied': 'APPLIED',
-      'interview': 'TECHNICAL_INTERVIEW',
+      'HR Interview': 'HR_SCREEN',
+      'Technical Interview': 'TECHNICAL_INTERVIEW',
+      'Final Interview': 'FINAL_INTERVIEW',
       'offer': 'OFFERED',
+      'accepted': 'ACCEPTED',
       'rejected': 'REJECTED'
     };
     return statusMap[frontendStatus] || 'APPLIED';
@@ -61,11 +64,11 @@ export function Dashboard({ user }: DashboardProps) {
   const mapStatusToFrontend = (backendStatus: string): ApplicationStatus => {
     const statusMap: Record<string, ApplicationStatus> = {
       'APPLIED': 'applied',
-      'HR_SCREEN': 'interview',
-      'TECHNICAL_INTERVIEW': 'interview',
-      'FINAL_INTERVIEW': 'interview',
+      'HR_SCREEN': 'HR Interview',
+      'TECHNICAL_INTERVIEW': 'Technical Interview',
+      'FINAL_INTERVIEW': 'Final Interview',
       'OFFERED': 'offer',
-      'ACCEPTED': 'offer',
+      'ACCEPTED': 'accepted',
       'REJECTED': 'rejected',
       'WITHDRAWN': 'rejected'
     };
@@ -234,8 +237,8 @@ export function Dashboard({ user }: DashboardProps) {
   const stats = {
     total: applications.length,
     applied: applications.filter((app) => app.status === "applied").length,
-    interviews: applications.filter((app) => app.status === "interview").length,
-    offers: applications.filter((app) => app.status === "offer").length,
+    interviews: applications.filter((app) => ["HR Interview", "Technical Interview", "Final Interview"].includes(app.status)).length,
+    offers: applications.filter((app) => ["offer", "accepted"].includes(app.status)).length,
     rejected: applications.filter((app) => app.status === "rejected").length,
   };
 

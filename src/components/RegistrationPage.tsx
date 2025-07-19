@@ -214,10 +214,10 @@ export function RegistrationPage({ onLogin }: RegistrationPageProps) {
               Already have an account?{' '}
               <button
                 onClick={() => navigate('/login')}
-                className="text-primary hover:underline"
+                className="text-primary hover:underline text-sm"
                 disabled={isLoading}
               >
-                Sign in
+                Login
               </button>
             </p>
           </div>
