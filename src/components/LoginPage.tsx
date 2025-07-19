@@ -5,30 +5,9 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { API_BASE_URL } from '../types/const';
+import { API_BASE_URL } from '../definitions/const';
 import { useNavigate } from 'react-router-dom';
-
-interface LoginPageProps {
-  onLogin: (userData: any) => void;
-}
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-interface UserResponse {
-  id: number;
-  email: string;
-  userName: string;
-  createdAt: string;
-}
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: UserResponse;
-}
+import { ApiResponse, LoginPageProps, LoginRequest, UserResponse } from '../definitions/interfaces';
 
 export function LoginPage({ onLogin }: LoginPageProps) {
   const [email, setEmail] = useState('');
@@ -104,7 +83,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
 
       onLogin(transformedUserData);
-      navigate('/dashboard'); // Перенаправление после успешного входа
+      navigate('/dashboard');
 
     } catch (err) {
       console.error('Login error:', err);

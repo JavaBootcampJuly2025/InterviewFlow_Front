@@ -20,7 +20,7 @@ import { Switch } from "../ui/switch";
 import {
   ApplicationFormData,
   ApplicationStatus,
-} from "../../types/application";
+} from "../../definitions/interfaces";
 
 interface EditApplicationDialogProps {
   isOpen: boolean;

@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { ApplicationList } from "./ApplicationList";
 import { Statistics } from "./Statistics";
-import { Application } from "../../types/application";
+import { Application } from "../../definitions/interfaces";
 
 interface DashboardTabsProps {
   applications: Application[];

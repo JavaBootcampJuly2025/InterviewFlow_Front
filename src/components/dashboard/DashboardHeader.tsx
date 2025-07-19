@@ -1,6 +1,6 @@
 import { AddApplicationDialog } from "./AddApplicationDialog";
 import { EditApplicationDialog } from "./EditApplicationDialog";
-import { Application, ApplicationFormData } from "../../types/application";
+import { Application, ApplicationFormData } from "../../definitions/interfaces";
 
 interface DashboardHeaderProps {
   user: any;

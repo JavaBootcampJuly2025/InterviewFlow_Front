@@ -20,10 +20,9 @@ import {
 import { Switch } from "../ui/switch";
 import { PlusIcon } from "lucide-react";
 import {
-  Application,
   ApplicationFormData,
   ApplicationStatus,
-} from "../../types/application";
+} from "../../definitions/interfaces";
 
 interface AddApplicationDialogProps {
   isOpen: boolean;

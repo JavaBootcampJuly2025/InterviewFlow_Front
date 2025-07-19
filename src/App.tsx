@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { HomePage } from "./components/HomePage";
 import { LoginPage } from "./components/LoginPage";
@@ -8,8 +8,9 @@ import { ProfilePage } from "./components/ProfilePage";
 import { Header } from "./components/Header";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import "./components/globals.css";
+import type { ReactElement } from "react";
 
-function PrivateRoute({ isAuthenticated, children }: { isAuthenticated: boolean, children: JSX.Element }) {
+function PrivateRoute({ isAuthenticated, children }: { isAuthenticated: boolean, children: ReactElement }) {
   return isAuthenticated ? children : <Navigate to="/" />;
 }
 

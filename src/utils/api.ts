@@ -1,6 +1,6 @@
 const API_BASE_URL = 'http://localhost:8080/api';
 
-export const getAuthHeaders = () => {
+export const getAuthHeaders = (): Record<string, string> => {
   const credentials = localStorage.getItem('authCredentials');
   return credentials ? {
     'Authorization': `Basic ${credentials}`,

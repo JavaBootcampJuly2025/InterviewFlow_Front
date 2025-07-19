@@ -3,47 +3,23 @@ import { useState, useEffect } from "react";
 import { StatsCards } from "./dashboard/StatsCards";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { DashboardTabs } from "./dashboard/DashboardTabs";
-import {API_BASE_URL} from '../types/const';
+import { API_BASE_URL } from '../definitions/const';
 import {
   Application,
   ApplicationFormData,
+  ApplicationListDTO,
   ApplicationStatus,
-} from "../types/application";
+  CreateApplicationRequest,
+  DashboardProps,
+  UpdateApplicationRequest,
+} from "../definitions/interfaces";
 
-interface DashboardProps {
-  user: any;
-}
-
-interface CreateApplicationRequest {
-  companyName: string;
-  companyLink?: string;
-  position: string;
-  status: string;
-  userId: number;
-}
-
-interface UpdateApplicationRequest {
-  companyName?: string;
-  companyLink?: string;
-  position?: string;
-  status?: string;
-}
-
-interface ApplicationListDTO {
-  id: number;
-  status: string;
-  companyName: string;
-  companyLink?: string;
-  position: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 export function Dashboard({ user }: DashboardProps) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState<Application | null>(null);
@@ -115,21 +91,21 @@ export function Dashboard({ user }: DashboardProps) {
 
   const loadApplications = async () => {
     if (!user?.id) return;
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/users/${user.id}/applications`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to load applications');
       }
-      
+
       const data: ApplicationListDTO[] = await response.json();
       const transformedApplications = data.map(transformApplicationFromAPI);
       setApplications(transformedApplications);
-      
+
     } catch (err) {
       console.error('Error loading applications:', err);
       setError('Failed to load applications');
@@ -140,7 +116,7 @@ export function Dashboard({ user }: DashboardProps) {
 
   const handleAddApplication = async () => {
     if (!user?.id) return;
-    
+
     try {
       const createRequest: CreateApplicationRequest = {
         companyName: newApplication.company,
@@ -163,7 +139,7 @@ export function Dashboard({ user }: DashboardProps) {
       }
 
       await loadApplications();
-      
+
       setNewApplication({
         company: "",
         position: "",
@@ -175,9 +151,9 @@ export function Dashboard({ user }: DashboardProps) {
         interviewTime: "",
         emailNotifications: false,
       });
-      
+
       setIsAddDialogOpen(false);
-      
+
     } catch (err) {
       console.error('Error creating application:', err);
       setError('Failed to create application');
@@ -224,10 +200,10 @@ export function Dashboard({ user }: DashboardProps) {
       }
 
       await loadApplications();
-      
+
       setIsEditDialogOpen(false);
       setEditingApplication(null);
-      
+
     } catch (err) {
       console.error('Error updating application:', err);
       setError('Failed to update application');
@@ -236,7 +212,7 @@ export function Dashboard({ user }: DashboardProps) {
 
   const handleDeleteApplication = async (applicationId: string) => {
     if (!confirm("Are you sure you want to delete this application?")) return;
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/applications/${applicationId}`, {
         method: 'DELETE',
@@ -247,7 +223,7 @@ export function Dashboard({ user }: DashboardProps) {
       }
 
       setApplications(applications.filter((app) => app.id !== applicationId));
-      
+
     } catch (err) {
       console.error('Error deleting application:', err);
       setError('Failed to delete application');
@@ -280,7 +256,7 @@ export function Dashboard({ user }: DashboardProps) {
           {error}
         </div>
       )}
-      
+
       <DashboardHeader
         user={user}
         isAddDialogOpen={isAddDialogOpen}

@@ -14,7 +14,7 @@ import {
   EditIcon,
   TrashIcon,
 } from "lucide-react";
-import { Application } from "../../types/application";
+import { Application } from "../../definitions/interfaces";
 import { getStatusIcon } from "../../utils/statusIcons";
 import { getStatusColor } from "../../utils/applicationUtils";
 
