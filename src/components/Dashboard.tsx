@@ -1,7 +1,9 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { StatsCards } from "./dashboard/StatsCards";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 import { DashboardTabs } from "./dashboard/DashboardTabs";
+import {API_BASE_URL} from '../types/const';
 import {
   Application,
   ApplicationFormData,
@@ -12,55 +14,39 @@ interface DashboardProps {
   user: any;
 }
 
-export function Dashboard({ user }: DashboardProps) {
-  const [applications, setApplications] = useState<Application[]>([
-    {
-      id: "1",
-      company: "Google",
-      position: "Software Engineer",
-      status: "interview",
-      dateApplied: "2025-01-15",
-      location: "Mountain View, CA",
-      notes: "Great team culture, focus on ML projects",
-      companyUrl: "https://careers.google.com",
-      interviewTime: "2025-01-25T10:00",
-      emailNotifications: true,
-    },
-    {
-      id: "2",
-      company: "Microsoft",
-      position: "Frontend Developer",
-      status: "applied",
-      dateApplied: "2025-01-18",
-      location: "Seattle, WA",
-      notes: "Applied through their careers portal",
-      companyUrl: "https://careers.microsoft.com",
-    },
-    {
-      id: "3",
-      company: "Meta",
-      position: "Full Stack Developer",
-      status: "offer",
-      dateApplied: "2025-01-10",
-      location: "Menlo Park, CA",
-      notes: "Received offer after 3 rounds of interviews",
-      companyUrl: "https://careers.meta.com",
-    },
-    {
-      id: "4",
-      company: "Apple",
-      position: "iOS Developer",
-      status: "rejected",
-      dateApplied: "2025-01-05",
-      location: "Cupertino, CA",
-      notes: "Technical round did not go well",
-    },
-  ]);
+interface CreateApplicationRequest {
+  companyName: string;
+  companyLink?: string;
+  position: string;
+  status: string;
+  userId: number;
+}
 
+interface UpdateApplicationRequest {
+  companyName?: string;
+  companyLink?: string;
+  position?: string;
+  status?: string;
+}
+
+interface ApplicationListDTO {
+  id: number;
+  status: string;
+  companyName: string;
+  companyLink?: string;
+  position: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export function Dashboard({ user }: DashboardProps) {
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingApplication, setEditingApplication] =
-    useState<Application | null>(null);
+  const [editingApplication, setEditingApplication] = useState<Application | null>(null);
 
   const [newApplication, setNewApplication] = useState<ApplicationFormData>({
     company: "",
@@ -86,26 +72,116 @@ export function Dashboard({ user }: DashboardProps) {
     emailNotifications: false,
   });
 
-  const handleAddApplication = () => {
-    const application: Application = {
-      id: Date.now().toString(),
-      ...newApplication,
-      dateApplied: new Date().toISOString().split("T")[0],
+  const mapStatusToBackend = (frontendStatus: ApplicationStatus): string => {
+    const statusMap: Record<ApplicationStatus, string> = {
+      'applied': 'APPLIED',
+      'interview': 'TECHNICAL_INTERVIEW',
+      'offer': 'OFFERED',
+      'rejected': 'REJECTED'
     };
+    return statusMap[frontendStatus] || 'APPLIED';
+  };
 
-    setApplications([...applications, application]);
-    setNewApplication({
-      company: "",
-      position: "",
-      location: "",
-      status: "applied",
-      notes: "",
-      companyUrl: "",
-      cvFile: "",
-      interviewTime: "",
-      emailNotifications: false,
-    });
-    setIsAddDialogOpen(false);
+  const mapStatusToFrontend = (backendStatus: string): ApplicationStatus => {
+    const statusMap: Record<string, ApplicationStatus> = {
+      'APPLIED': 'applied',
+      'HR_SCREEN': 'interview',
+      'TECHNICAL_INTERVIEW': 'interview',
+      'FINAL_INTERVIEW': 'interview',
+      'OFFERED': 'offer',
+      'ACCEPTED': 'offer',
+      'REJECTED': 'rejected',
+      'WITHDRAWN': 'rejected'
+    };
+    return statusMap[backendStatus] || 'applied';
+  };
+
+  const transformApplicationFromAPI = (dto: ApplicationListDTO): Application => {
+    return {
+      id: dto.id.toString(),
+      company: dto.companyName,
+      position: dto.position,
+      status: mapStatusToFrontend(dto.status),
+      dateApplied: dto.createdAt.split('T')[0],
+      location: "", // Not provided by backend
+      notes: "", // Not provided by backend
+      companyUrl: dto.companyLink || "",
+    };
+  };
+
+  useEffect(() => {
+    loadApplications();
+  }, [user]);
+
+  const loadApplications = async () => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}/applications`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to load applications');
+      }
+      
+      const data: ApplicationListDTO[] = await response.json();
+      const transformedApplications = data.map(transformApplicationFromAPI);
+      setApplications(transformedApplications);
+      
+    } catch (err) {
+      console.error('Error loading applications:', err);
+      setError('Failed to load applications');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddApplication = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const createRequest: CreateApplicationRequest = {
+        companyName: newApplication.company,
+        companyLink: newApplication.companyUrl || undefined,
+        position: newApplication.position,
+        status: mapStatusToBackend(newApplication.status),
+        userId: parseInt(user.id)
+      };
+
+      const response = await fetch(`${API_BASE_URL}/applications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(createRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create application');
+      }
+
+      await loadApplications();
+      
+      setNewApplication({
+        company: "",
+        position: "",
+        location: "",
+        status: "applied",
+        notes: "",
+        companyUrl: "",
+        cvFile: "",
+        interviewTime: "",
+        emailNotifications: false,
+      });
+      
+      setIsAddDialogOpen(false);
+      
+    } catch (err) {
+      console.error('Error creating application:', err);
+      setError('Failed to create application');
+    }
   };
 
   const handleEditApplication = (application: Application) => {
@@ -124,21 +200,58 @@ export function Dashboard({ user }: DashboardProps) {
     setIsEditDialogOpen(true);
   };
 
-  const handleUpdateApplication = () => {
+  const handleUpdateApplication = async () => {
     if (!editingApplication) return;
 
-    const updatedApplications = applications.map((app) =>
-      app.id === editingApplication.id ? { ...app, ...editForm } : app
-    );
+    try {
+      const updateRequest: UpdateApplicationRequest = {
+        companyName: editForm.company,
+        companyLink: editForm.companyUrl || undefined,
+        position: editForm.position,
+        status: mapStatusToBackend(editForm.status),
+      };
 
-    setApplications(updatedApplications);
-    setIsEditDialogOpen(false);
-    setEditingApplication(null);
+      const response = await fetch(`${API_BASE_URL}/applications/${editingApplication.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateRequest),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update application');
+      }
+
+      await loadApplications();
+      
+      setIsEditDialogOpen(false);
+      setEditingApplication(null);
+      
+    } catch (err) {
+      console.error('Error updating application:', err);
+      setError('Failed to update application');
+    }
   };
 
-  const handleDeleteApplication = (applicationId: string) => {
-    if (confirm("Are you sure you want to delete this application?")) {
+  const handleDeleteApplication = async (applicationId: string) => {
+    if (!confirm("Are you sure you want to delete this application?")) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/applications/${applicationId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete application');
+      }
+
       setApplications(applications.filter((app) => app.id !== applicationId));
+      
+    } catch (err) {
+      console.error('Error deleting application:', err);
+      setError('Failed to delete application');
+      await loadApplications();
     }
   };
 
@@ -150,8 +263,24 @@ export function Dashboard({ user }: DashboardProps) {
     rejected: applications.filter((app) => app.status === "rejected").length,
   };
 
+  if (isLoading) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="flex justify-center items-center h-64">
+          <p>Loading applications...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+      
       <DashboardHeader
         user={user}
         isAddDialogOpen={isAddDialogOpen}

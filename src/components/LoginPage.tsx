@@ -5,10 +5,29 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import {API_BASE_URL} from '../types/const';
 
 interface LoginPageProps {
   onNavigate: (page: string) => void;
   onLogin: (userData: any) => void;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface UserResponse {
+  id: number;
+  email: string;
+  userName: string;
+  createdAt: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: UserResponse;
 }
 
 export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
@@ -18,29 +37,76 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const loginUser = async (loginData: LoginRequest): Promise<UserResponse> => {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(loginData),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Invalid email or password');
+      }
+      if (response.status === 400) {
+        throw new Error('Please check your email and password');
+      }
+      throw new Error('Login failed. Please try again.');
+    }
+
+    const apiResponse: ApiResponse = await response.json();
+    
+    // Check if the API response indicates success
+    if (!apiResponse.success) {
+      throw new Error(apiResponse.message || 'Login failed');
+    }
+
+    // Return the actual user data from the API response
+    return apiResponse.data;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Mock authentication - in real app, this would be an API call
     try {
-      if (email && password) {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const userData = {
-          id: '1',
-          email: email,
-          name: 'John Doe'
-        };
-        
-        onLogin(userData);
-      } else {
+      if (!email || !password) {
         setError('Please fill in all fields');
+        return;
       }
+
+      if (!email.includes('@')) {
+        setError('Please enter a valid email address');
+        return;
+      }
+
+      const loginData: LoginRequest = {
+        email: email.trim(),
+        password: password
+      };
+
+      const userData = await loginUser(loginData);
+      
+      // Store user email for future API calls (if needed)
+      localStorage.setItem('userEmail', email);
+      
+      // Transform API response to match expected format
+      const transformedUserData = {
+        id: userData.id.toString(),
+        email: userData.email,
+        name: userData.userName,
+        userName: userData.userName,
+      };
+
+      
+      onLogin(transformedUserData);
+      
     } catch (err) {
-      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
+      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +138,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -85,11 +152,13 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
@@ -111,6 +180,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
               <button
                 onClick={() => onNavigate('register')}
                 className="text-primary hover:underline"
+                disabled={isLoading}
               >
                 Sign up
               </button>

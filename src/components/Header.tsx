@@ -19,7 +19,7 @@ export function Header({ currentPage, onNavigate, isAuthenticated, onLogout }: H
               className="cursor-pointer hover:text-primary transition-colors"
               onClick={() => onNavigate('home')}
             >
-              JobTracker
+              Interview Flow
             </h1>
           </div>
           
