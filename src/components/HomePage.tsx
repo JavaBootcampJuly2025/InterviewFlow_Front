@@ -12,12 +12,11 @@ import {
   BarChart3Icon,
   BellIcon,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface HomePageProps {
-  onNavigate: (page: string) => void;
-}
+export function HomePage() {
+  const navigate = useNavigate();
 
-export function HomePage({ onNavigate }: HomePageProps) {
   const features = [
     {
       icon: CheckCircleIcon,
@@ -53,13 +52,13 @@ export function HomePage({ onNavigate }: HomePageProps) {
           organized and boost your job search success.
         </p>
         <div className="flex justify-center space-x-4">
-          <Button size="lg" onClick={() => onNavigate("register")}>
+          <Button size="lg" onClick={() => navigate("/register")}>
             Get Started Free
           </Button>
           <Button
             size="lg"
             variant="outline"
-            onClick={() => onNavigate("login")}
+            onClick={() => navigate("/login")}
           >
             Sign In
           </Button>
@@ -100,7 +99,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
           Join thousands of job seekers who are already using JobTracker to land
           their dream jobs.
         </p>
-        <Button size="lg" onClick={() => onNavigate("register")}>
+        <Button size="lg" onClick={() => navigate("/register")}>
           Start Tracking Today
         </Button>
       </div>

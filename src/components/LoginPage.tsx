@@ -5,10 +5,10 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import {API_BASE_URL} from '../types/const';
+import { API_BASE_URL } from '../types/const';
+import { useNavigate } from 'react-router-dom';
 
 interface LoginPageProps {
-  onNavigate: (page: string) => void;
   onLogin: (userData: any) => void;
 }
 
@@ -30,12 +30,13 @@ interface ApiResponse {
   data: UserResponse;
 }
 
-export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
+export function LoginPage({ onLogin }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const loginUser = async (loginData: LoginRequest): Promise<UserResponse> => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -57,7 +58,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
     }
 
     const apiResponse: ApiResponse = await response.json();
-    
+
     // Check if the API response indicates success
     if (!apiResponse.success) {
       throw new Error(apiResponse.message || 'Login failed');
@@ -89,10 +90,10 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
       };
 
       const userData = await loginUser(loginData);
-      
+
       // Store user email for future API calls (if needed)
       localStorage.setItem('userEmail', email);
-      
+
       // Transform API response to match expected format
       const transformedUserData = {
         id: userData.id.toString(),
@@ -101,9 +102,10 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
         userName: userData.userName,
       };
 
-      
+
       onLogin(transformedUserData);
-      
+      navigate('/dashboard'); // Перенаправление после успешного входа
+
     } catch (err) {
       console.error('Login error:', err);
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
@@ -128,7 +130,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -141,7 +143,7 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
                 disabled={isLoading}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -168,17 +170,17 @@ export function LoginPage({ onNavigate, onLogin }: LoginPageProps) {
                 </button>
               </div>
             </div>
-            
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
               <button
-                onClick={() => onNavigate('register')}
+                onClick={() => navigate('/register')}
                 className="text-primary hover:underline"
                 disabled={isLoading}
               >

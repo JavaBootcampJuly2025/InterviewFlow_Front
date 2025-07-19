@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { HomePage } from "./components/HomePage";
 import { LoginPage } from "./components/LoginPage";
 import { RegistrationPage } from "./components/RegistrationPage";
@@ -8,68 +9,73 @@ import { Header } from "./components/Header";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import "./components/globals.css";
 
+function PrivateRoute({ isAuthenticated, children }: { isAuthenticated: boolean, children: JSX.Element }) {
+  return isAuthenticated ? children : <Navigate to="/" />;
+}
+
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("home");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const handleLogin = (userData: any) => {
     setIsAuthenticated(true);
     setUser(userData);
-    setCurrentPage("dashboard");
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUser(null);
-    setCurrentPage("home");
+    localStorage.removeItem("user");
   };
 
   const handleUserUpdate = (updatedUser: any) => {
     setUser(updatedUser);
   };
 
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case "home":
-        return <HomePage onNavigate={setCurrentPage} />;
-      case "login":
-        return <LoginPage onNavigate={setCurrentPage} onLogin={handleLogin} />;
-      case "register":
-        return (
-          <RegistrationPage onNavigate={setCurrentPage} onLogin={handleLogin} />
-        );
-      case "dashboard":
-        return isAuthenticated ? (
-          <Dashboard user={user} />
-        ) : (
-          <HomePage onNavigate={setCurrentPage} />
-        );
-      case "profile":
-        return isAuthenticated ? (
-          <ProfilePage user={user} onUserUpdate={handleUserUpdate} />
-        ) : (
-          <HomePage onNavigate={setCurrentPage} />
-        );
-      default:
-        return <HomePage onNavigate={setCurrentPage} />;
-    }
-  };
-
   return (
-    <div className="min-h-screen relative">
-      <AnimatedBackground />
-      <div className="relative z-10">
-        <Header
-          currentPage={currentPage}
-          onNavigate={setCurrentPage}
-          isAuthenticated={isAuthenticated}
-          onLogout={handleLogout}
-        />
-        <main className="container mx-auto px-4 py-8">
-          {renderCurrentPage()}
-        </main>
+    <Router>
+      <div className="min-h-screen relative">
+        <AnimatedBackground />
+        <div className="relative z-10">
+          <Header
+            isAuthenticated={isAuthenticated}
+            onLogout={handleLogout}
+          />
+          <main className="container mx-auto px-4 py-8">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+              <Route path="/register" element={<RegistrationPage onLogin={handleLogin} />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute isAuthenticated={isAuthenticated}>
+                    <Dashboard user={user} />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute isAuthenticated={isAuthenticated}>
+                    <ProfilePage user={user} onUserUpdate={handleUserUpdate} />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </main>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }

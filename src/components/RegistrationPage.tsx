@@ -5,9 +5,10 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Alert, AlertDescription } from './ui/alert';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { API_BASE_URL } from '../types/const';
+import { useNavigate } from 'react-router-dom';
 
 interface RegistrationPageProps {
-  onNavigate: (page: string) => void;
   onLogin: (userData: any) => void;
 }
 
@@ -30,9 +31,7 @@ interface ApiResponse {
   data: UserResponse;
 }
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
-export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps) {
+export function RegistrationPage({ onLogin }: RegistrationPageProps) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,6 +39,7 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const registerUser = async (registerData: RegisterRequest): Promise<UserResponse> => {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -70,7 +70,7 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
     }
 
     const apiResponse: ApiResponse = await response.json();
-    
+
     // Check if the API response indicates success
     if (!apiResponse.success) {
       throw new Error(apiResponse.message || 'Registration failed');
@@ -119,10 +119,10 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
       };
 
       const userData = await registerUser(registerData);
-      
+
       // Store user email for future reference (if needed)
       localStorage.setItem('userEmail', email);
-      
+
       // Transform API response to match expected format
       const transformedUserData = {
         id: userData.id.toString(),
@@ -130,10 +130,11 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
         name: userData.userName,
         userName: userData.userName,
       };
-      
+
       // Automatically log in the user after successful registration
       onLogin(transformedUserData);
-      
+      navigate('/dashboard'); // Перенаправление после успешной регистрации
+
     } catch (err) {
       console.error('Registration error:', err);
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
@@ -158,7 +159,7 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="username">Full Name</Label>
               <Input
@@ -171,7 +172,7 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
                 disabled={isLoading}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -184,7 +185,7 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
                 disabled={isLoading}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -211,7 +212,7 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
                 </button>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
@@ -224,17 +225,17 @@ export function RegistrationPage({ onNavigate, onLogin }: RegistrationPageProps)
                 disabled={isLoading}
               />
             </div>
-            
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
               <button
-                onClick={() => onNavigate('login')}
+                onClick={() => navigate('/login')}
                 className="text-primary hover:underline"
                 disabled={isLoading}
               >
