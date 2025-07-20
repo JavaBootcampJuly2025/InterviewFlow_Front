@@ -95,10 +95,10 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
   return (
     <div className="max-w-md mx-auto">
-      <Card>
+      <Card className='p-3 gap-2'>
         <CardHeader className="text-center">
           <CardTitle>Welcome Back</CardTitle>
-          <CardDescription>
+          <CardDescription className='text-sm'>
             Sign in to your account to continue tracking your applications
           </CardDescription>
         </CardHeader>

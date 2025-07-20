@@ -32,13 +32,13 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       const updatedUser = {
         ...user,
         name: name,
         email: email
       };
-      
+
       onUserUpdate(updatedUser);
       setSuccess('Profile updated successfully!');
     } catch (err) {
@@ -75,7 +75,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setSuccess('Password changed successfully!');
       setCurrentPassword('');
       setNewPassword('');
@@ -98,13 +98,13 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Profile Information */}
-        <Card>
+        <Card className="py-2 gap-2">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <UserIcon className="h-5 w-5" />
               <span>Profile Information</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className='text-sm'>
               Update your name and email address
             </CardDescription>
           </CardHeader>
@@ -115,7 +115,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   <AlertDescription>{error || success}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -127,7 +127,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   required
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -139,7 +139,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   required
                 />
               </div>
-              
+
               <Button type="submit" disabled={isLoading}>
                 <SaveIcon className="h-4 w-4 mr-2" />
                 {isLoading ? 'Updating...' : 'Update Profile'}
@@ -149,13 +149,13 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
         </Card>
 
         {/* Password Change */}
-        <Card>
+        <Card className="py-2 gap-2">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <KeyIcon className="h-5 w-5" />
               <span>Change Password</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className='text-sm'>
               Update your password to keep your account secure
             </CardDescription>
           </CardHeader>
@@ -185,7 +185,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   </button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
@@ -210,7 +210,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   </button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
                 <Input
@@ -222,7 +222,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   required
                 />
               </div>
-              
+
               <Button type="submit" disabled={isLoading}>
                 <KeyIcon className="h-4 w-4 mr-2" />
                 {isLoading ? 'Changing...' : 'Change Password'}
@@ -233,7 +233,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
       </div>
 
       {/* Account Statistics */}
-      <Card>
+      <Card className="py-2 gap-2">
         <CardHeader>
           <CardTitle>Account Statistics</CardTitle>
           <CardDescription>

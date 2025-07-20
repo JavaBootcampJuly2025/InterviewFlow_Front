@@ -1,5 +1,6 @@
 import { BriefcaseIcon, GithubIcon, LinkedinIcon, MailIcon } from 'lucide-react';
 import { Button } from './ui/button';
+import { Logo } from './header/Logo';
 
 export function Footer() {
     const currentYear = new Date().getFullYear();
@@ -10,8 +11,7 @@ export function Footer() {
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0 ">
                     <div className="flex flex-col items-center md:items-start space-y-4">
                         <div className="flex items-center md:items-start space-x-2">
-                            <BriefcaseIcon className="h-5 w-4 text-primary" />
-                            <span className="font-semibold text-sm">Interview Flow</span>
+                            <Logo isFooter />
                         </div>
                         <p className="text-xs text-muted-foreground max-w-xs text-center md:text-left">
                             Streamline your interview process with our comprehensive job application tracking system.

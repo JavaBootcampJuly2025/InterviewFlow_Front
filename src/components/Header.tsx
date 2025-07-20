@@ -1,6 +1,7 @@
 import { Button } from './ui/button';
 import { BriefcaseIcon, UserIcon, SettingsIcon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Logo } from './header/Logo';
 
 interface HeaderProps {
   isAuthenticated: boolean;
@@ -30,13 +31,7 @@ export function Header({ isAuthenticated, onLogout }: HeaderProps) {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <BriefcaseIcon className="h-8 w-8 text-primary" />
-            <h1
-              className="cursor-pointer hover:text-primary transition-colors"
-              onClick={() => navigate('/')}
-            >
-              Interview Flow
-            </h1>
+            <Logo className="h-8 w-8" onClick={() => navigate('/')} />
           </div>
 
           <nav className="flex items-center space-x-4">

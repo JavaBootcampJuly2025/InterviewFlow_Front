@@ -123,10 +123,10 @@ export function RegistrationPage({ onLogin }: RegistrationPageProps) {
 
   return (
     <div className="max-w-md mx-auto">
-      <Card>
+      <Card className='p-3 gap-2'>
         <CardHeader className="text-center">
           <CardTitle>Create Your Account</CardTitle>
-          <CardDescription>
+          <CardDescription className='text-sm'>
             Join Interview Flow and start organizing your job search today
           </CardDescription>
         </CardHeader>
