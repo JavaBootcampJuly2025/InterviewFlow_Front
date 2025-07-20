@@ -1,6 +1,6 @@
 import { BriefcaseIcon, GithubIcon, LinkedinIcon, MailIcon } from 'lucide-react';
-import { Button } from './ui/button';
-import { Logo } from './header/Logo';
+import { Button } from '../ui/button';
+import { Logo } from '../header/Logo';
 
 export function Footer() {
     const currentYear = new Date().getFullYear();

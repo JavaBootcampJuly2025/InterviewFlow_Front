@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { StatsCards } from "./dashboard/StatsCards";
-import { DashboardHeader } from "./dashboard/DashboardHeader";
-import { DashboardTabs } from "./dashboard/DashboardTabs";
-import { API_BASE_URL } from '../definitions/const';
+import { StatsCards } from "./StatsCards";
+import { DashboardHeader } from "./DashboardHeader";
+import { DashboardTabs } from "./DashboardTabs";
+import { API_BASE_URL } from '../../definitions/const';
 import {
   Application,
   ApplicationFormData,
@@ -12,10 +12,10 @@ import {
   CreateApplicationRequest,
   DashboardProps,
   UpdateApplicationRequest,
-} from "../definitions/interfaces";
+} from "../../definitions/interfaces";
 
 
-export function Dashboard({ user }: DashboardProps) {
+export function DashboardPage({ user }: DashboardProps) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');

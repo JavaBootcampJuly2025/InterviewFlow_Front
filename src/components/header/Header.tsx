@@ -1,7 +1,7 @@
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { BriefcaseIcon, UserIcon, SettingsIcon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Logo } from './header/Logo';
+import { Logo } from './Logo';
 
 interface HeaderProps {
   isAuthenticated: boolean;

@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Alert, AlertDescription } from './ui/alert';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Alert, AlertDescription } from '../ui/alert';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
-import { API_BASE_URL } from '../definitions/const';
+import { API_BASE_URL } from '../../definitions/const';
 import { useNavigate } from 'react-router-dom';
-import { ApiResponse, RegisterRequest, RegistrationPageProps, UserResponse } from '../definitions/interfaces';
+import { ApiResponse, RegisterRequest, RegistrationPageProps, UserResponse } from '../../definitions/interfaces';
 
 export function RegistrationPage({ onLogin }: RegistrationPageProps) {
   const [username, setUsername] = useState('');

@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { HomePage } from "./components/HomePage";
-import { LoginPage } from "./components/LoginPage";
-import { RegistrationPage } from "./components/RegistrationPage";
-import { Dashboard } from "./components/Dashboard";
-import { ProfilePage } from "./components/ProfilePage";
-import { Header } from "./components/Header";
-import { Footer } from "./components/Footer";
-import { AnimatedBackground } from "./components/AnimatedBackground";
-import "./components/globals.css";
+import { HomePage } from "./components/home/HomePage";
+import { LoginPage } from "./components/login/LoginPage";
+import { RegistrationPage } from "./components/registration/RegistrationPage";
+import { DashboardPage } from "./components/dashboard/DashboardPage";
+import { ProfilePage } from "./components/profile/ProfilePage";
+import { Header } from "./components/header/Header";
+import { Footer } from "./components/footer/Footer";
+import { AnimatedBackground } from "./components/background/AnimatedBackground";
+import "./globals.css";
 import type { ReactElement } from "react";
 
 function PrivateRoute({ isAuthenticated, children }: { isAuthenticated: boolean, children: ReactElement }) {
@@ -58,7 +58,7 @@ export default function App() {
                 path="/"
                 element={
                   <PrivateRoute isAuthenticated={isAuthenticated}>
-                    <Dashboard user={user} />
+                    <DashboardPage user={user} />
                   </PrivateRoute>
                 }
               />)}
@@ -68,7 +68,7 @@ export default function App() {
                 path="/dashboard"
                 element={
                   <PrivateRoute isAuthenticated={isAuthenticated}>
-                    <Dashboard user={user} />
+                    <DashboardPage user={user} />
                   </PrivateRoute>
                 }
               />
