@@ -171,6 +171,28 @@ export function AddApplicationDialog({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="applicationDate">Application date *</Label>
+            <Input
+              id="applicationDate"
+              type="datetime-local"
+              value={formData.applyDate}
+              max={new Date().toISOString().slice(0, 16)} // Prevent future dates
+              onChange={(e) => {
+                // Ensure ISO-8601 with seconds
+                let value = e.target.value;
+                if (value && value.length === 16) {
+                  value = value + ":00";
+                }
+                onFormChange({
+                  ...formData,
+                  applyDate: value,
+                });
+              }}
+              required
+            />
+          </div>
+
           {["HR Interview",
             "Technical Interview",
             "Final Interview"].includes(formData.status) && (

@@ -10,6 +10,7 @@ export interface Application {
   cvFile?: string;
   interviewTime?: string;
   emailNotifications?: boolean;
+  applyDate?: string;
 }
 
 export type ApplicationStatus = "applied" | "HR Interview" | "Technical Interview" | "Final Interview" | "offer" |  "accepted" | "rejected";
@@ -24,6 +25,7 @@ export interface ApplicationFormData {
   cvFile: string;
   interviewTime: string;
   emailNotifications: boolean;
+  applyDate: string;
 }
 
 export interface DashboardProps {
@@ -36,6 +38,7 @@ export interface CreateApplicationRequest {
   position: string;
   status: string;
   userId: number;
+  applyDate?: string;
 }
 
 export interface UpdateApplicationRequest {
@@ -43,6 +46,7 @@ export interface UpdateApplicationRequest {
   companyLink?: string;
   position?: string;
   status?: string;
+  applyDate?: string;
 }
 
 export interface ApplicationListDTO {
@@ -53,6 +57,7 @@ export interface ApplicationListDTO {
   position: string;
   createdAt: string;
   updatedAt: string;
+  applyDate: string;
 }
 
 export interface LoginPageProps {
