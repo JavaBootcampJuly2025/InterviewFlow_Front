@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { StatsCards } from "./StatsCards";
 import { DashboardHeader } from "./DashboardHeader";
@@ -34,6 +33,7 @@ export function DashboardPage({ user }: DashboardProps) {
     cvFile: "",
     interviewTime: "",
     emailNotifications: false,
+    applyDate: "",
   });
 
   const [editForm, setEditForm] = useState<ApplicationFormData>({
@@ -46,6 +46,7 @@ export function DashboardPage({ user }: DashboardProps) {
     cvFile: "",
     interviewTime: "",
     emailNotifications: false,
+    applyDate: "",
   });
 
   const mapStatusToBackend = (frontendStatus: ApplicationStatus): string => {
@@ -85,6 +86,7 @@ export function DashboardPage({ user }: DashboardProps) {
       location: "", // Not provided by backend
       notes: "", // Not provided by backend
       companyUrl: dto.companyLink || "",
+      applyDate: dto.applyDate || dto.createdAt || "",
     };
   };
 
@@ -117,6 +119,18 @@ export function DashboardPage({ user }: DashboardProps) {
     }
   };
 
+  const ensureIso8601DateTime = (dateStr: string) => {
+    if (!dateStr) return "";
+    // Convert space to T
+    let [date, time] = dateStr.includes('T') ? dateStr.split('T') : dateStr.split(' ');
+    if (!time) return dateStr;
+    // Add seconds if missing
+    if (time.length === 5) time = time + ":00";
+    // Remove milliseconds if present
+    if (time.length > 8) time = time.slice(0, 8);
+    return `${date}T${time}`;
+  };
+
   const handleAddApplication = async () => {
     if (!user?.id) return;
 
@@ -126,7 +140,8 @@ export function DashboardPage({ user }: DashboardProps) {
         companyLink: newApplication.companyUrl || undefined,
         position: newApplication.position,
         status: mapStatusToBackend(newApplication.status),
-        userId: parseInt(user.id)
+        userId: parseInt(user.id),
+        applyDate: ensureIso8601DateTime(newApplication.applyDate) || undefined,
       };
 
       const response = await fetch(`${API_BASE_URL}/applications`, {
@@ -153,6 +168,7 @@ export function DashboardPage({ user }: DashboardProps) {
         cvFile: "",
         interviewTime: "",
         emailNotifications: false,
+        applyDate: "",
       });
 
       setIsAddDialogOpen(false);
@@ -175,6 +191,7 @@ export function DashboardPage({ user }: DashboardProps) {
       cvFile: application.cvFile || "",
       interviewTime: application.interviewTime || "",
       emailNotifications: application.emailNotifications || false,
+      applyDate: application.applyDate || "",
     });
     setIsEditDialogOpen(true);
   };
@@ -188,6 +205,7 @@ export function DashboardPage({ user }: DashboardProps) {
         companyLink: editForm.companyUrl || undefined,
         position: editForm.position,
         status: mapStatusToBackend(editForm.status),
+        applyDate: ensureIso8601DateTime(editForm.applyDate) || undefined,
       };
 
       const response = await fetch(`${API_BASE_URL}/applications/${editingApplication.id}`, {
