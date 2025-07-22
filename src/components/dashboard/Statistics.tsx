@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { Badge } from "../ui/badge";
 import { BarChart3Icon } from "lucide-react";
 import {
   PieChart,

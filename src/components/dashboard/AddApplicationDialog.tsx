@@ -177,9 +177,8 @@ export function AddApplicationDialog({
               id="applicationDate"
               type="datetime-local"
               value={formData.applyDate}
-              max={new Date().toISOString().slice(0, 16)} // Prevent future dates
+              max={new Date().toISOString().slice(0, 16)}
               onChange={(e) => {
-                // Ensure ISO-8601 with seconds
                 let value = e.target.value;
                 if (value && value.length === 16) {
                   value = value + ":00";

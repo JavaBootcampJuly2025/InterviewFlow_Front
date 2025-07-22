@@ -37,7 +37,6 @@ export interface CreateApplicationRequest {
   companyLink?: string;
   position: string;
   status: string;
-  userId: number;
   applyDate?: string;
 }
 
@@ -74,6 +73,8 @@ export interface UserResponse {
   email: string;
   userName: string;
   createdAt: string;
+  access_token?: string;
+  token_type?: string;
 }
 
 export interface ApiResponse {
@@ -91,5 +92,3 @@ export interface RegisterRequest {
   email: string;
   password: string;
 }
-
-
