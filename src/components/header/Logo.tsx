@@ -21,17 +21,16 @@ export function Logo({ className = "", onClick, isFooter }: LogoProps) {
                 >
                     <defs>
                         <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#6ea8fe" /> {/* blue */}
-                            <stop offset="50%" stopColor="#b392ff" /> {/* purple */}
-                            <stop offset="100%" stopColor="#f3a6e8" /> {/* pink */}
+                            <stop offset="0%" stopColor="#6ea8fe" />
+                            <stop offset="50%" stopColor="#b392ff" />
+                            <stop offset="100%" stopColor="#f3a6e8" />
                         </linearGradient>
                         <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#b392ff" /> {/* purple */}
-                            <stop offset="100%" stopColor="#f3a6e8" /> {/* pink */}
+                            <stop offset="0%" stopColor="#b392ff" />
+                            <stop offset="100%" stopColor="#f3a6e8" />
                         </linearGradient>
                     </defs>
 
-                    {/* Main Background */}
                     <circle
                         cx="20"
                         cy="20"
@@ -39,9 +38,7 @@ export function Logo({ className = "", onClick, isFooter }: LogoProps) {
                         fill="url(#logoGradient)"
                     />
 
-                    {/* Inner geometric design - representing job flow/tracking */}
                     <g transform="translate(8, 8)">
-                        {/* Top bar - representing applications */}
                         <rect
                             x="2"
                             y="4"

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { StatsCards } from "./StatsCards";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardTabs } from "./DashboardTabs";
-import { API_BASE_URL } from '../../definitions/const';
+import { apiRequest } from '../../utils/api';
 import {
   Application,
   ApplicationFormData,
@@ -12,7 +12,6 @@ import {
   DashboardProps,
   UpdateApplicationRequest,
 } from "../../definitions/interfaces";
-
 
 export function DashboardPage({ user }: DashboardProps) {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -101,13 +100,7 @@ export function DashboardPage({ user }: DashboardProps) {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${user.id}/applications`);
-
-      if (!response.ok) {
-        throw new Error('Failed to load applications');
-      }
-
-      const data: ApplicationListDTO[] = await response.json();
+      const data = await apiRequest('/applications') as ApplicationListDTO[];
       const transformedApplications = data.map(transformApplicationFromAPI);
       setApplications(transformedApplications);
 
@@ -119,16 +112,13 @@ export function DashboardPage({ user }: DashboardProps) {
     }
   };
 
-  const ensureIso8601DateTime = (dateStr: string) => {
+  const ensureBackendDateTimeFormat = (dateStr: string) => {
     if (!dateStr) return "";
-    // Convert space to T
     let [date, time] = dateStr.includes('T') ? dateStr.split('T') : dateStr.split(' ');
     if (!time) return dateStr;
-    // Add seconds if missing
     if (time.length === 5) time = time + ":00";
-    // Remove milliseconds if present
     if (time.length > 8) time = time.slice(0, 8);
-    return `${date}T${time}`;
+    return `${date} ${time}`;
   };
 
   const handleAddApplication = async () => {
@@ -140,21 +130,13 @@ export function DashboardPage({ user }: DashboardProps) {
         companyLink: newApplication.companyUrl || undefined,
         position: newApplication.position,
         status: mapStatusToBackend(newApplication.status),
-        userId: parseInt(user.id),
-        applyDate: ensureIso8601DateTime(newApplication.applyDate) || undefined,
+        applyDate: ensureBackendDateTimeFormat(newApplication.applyDate) || undefined,
       };
 
-      const response = await fetch(`${API_BASE_URL}/applications`, {
+      await apiRequest('/applications', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(createRequest),
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to create application');
-      }
 
       await loadApplications();
 
@@ -205,20 +187,13 @@ export function DashboardPage({ user }: DashboardProps) {
         companyLink: editForm.companyUrl || undefined,
         position: editForm.position,
         status: mapStatusToBackend(editForm.status),
-        applyDate: ensureIso8601DateTime(editForm.applyDate) || undefined,
+        applyDate: ensureBackendDateTimeFormat(editForm.applyDate) || undefined,
       };
 
-      const response = await fetch(`${API_BASE_URL}/applications/${editingApplication.id}`, {
+      await apiRequest(`/applications/${editingApplication.id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(updateRequest),
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to update application');
-      }
 
       await loadApplications();
 
@@ -235,13 +210,9 @@ export function DashboardPage({ user }: DashboardProps) {
     if (!confirm("Are you sure you want to delete this application?")) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/applications/${applicationId}`, {
+      await apiRequest(`/applications/${applicationId}`, {
         method: 'DELETE',
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete application');
-      }
 
       setApplications(applications.filter((app) => app.id !== applicationId));
 

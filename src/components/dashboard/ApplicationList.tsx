@@ -115,7 +115,6 @@ export function ApplicationList({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Filter and Sort Controls */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
           <div className="flex-1">
             <Input
