@@ -37,6 +37,10 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}): P
     throw new Error(`API request failed: ${response.statusText}`);
   }
 
+  if (response.status === 204) {
+    return null;
+  }
+
   const data = await response.json();
   console.log('API response data:', data);
   return data;

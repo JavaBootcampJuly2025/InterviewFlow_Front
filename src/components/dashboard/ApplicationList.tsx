@@ -23,11 +23,14 @@ import {
   TrashIcon,
   FilterIcon,
   SortAscIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
 } from "lucide-react";
 import { Application } from "../../definitions/interfaces";
 import { getStatusIcon } from "../../utils/statusIcons";
 import { getStatusColor } from "../../utils/applicationUtils";
 import { useState, useMemo } from "react";
+import { NotesSection } from '../notes/NotesSection';
 
 interface ApplicationListProps {
   applications: Application[];
@@ -44,6 +47,7 @@ export function ApplicationList({
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("dateApplied");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [expandedApplications, setExpandedApplications] = useState<Set<string>>(new Set());
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = applications.filter((app) => {
@@ -105,6 +109,16 @@ export function ApplicationList({
     { value: "position", label: "Position" },
     { value: "status", label: "Status" },
   ];
+
+  const toggleApplicationExpanded = (applicationId: string) => {
+    const newExpanded = new Set(expandedApplications);
+    if (newExpanded.has(applicationId)) {
+      newExpanded.delete(applicationId);
+    } else {
+      newExpanded.add(applicationId);
+    }
+    setExpandedApplications(newExpanded);
+  };
 
   return (
     <Card>
@@ -229,6 +243,23 @@ export function ApplicationList({
                       >
                         <TrashIcon className="h-4 w-4" />
                       </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleApplicationExpanded(application.id)}
+                        className="h-8 w-8 p-0"
+                        aria-label={
+                          expandedApplications.has(application.id)
+                            ? "Collapse notes"
+                            : "Expand notes"
+                        }
+                      >
+                        {expandedApplications.has(application.id) ? (
+                          <ChevronDownIcon className="h-4 w-4" />
+                        ) : (
+                          <ChevronRightIcon className="h-4 w-4" />
+                        )}
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -259,6 +290,11 @@ export function ApplicationList({
                       )}
                     </div>
                   )}
+                {expandedApplications.has(application.id) && (
+                  <div className="border-t pt-4">
+                    <NotesSection applicationId={application.id} />
+                  </div>
+                )}
               </div>
             ))
           )}
