@@ -92,15 +92,16 @@ export function AnimatedBackground() {
         </div>
       </div>
 
+
       {/* Modern connection network */}
       <svg className="absolute inset-0 w-full h-full opacity-30">
         <defs>
           <linearGradient
-            id="modernConnectionGradient"
-            x1="0%"
-            y1="0%"
-            x2="100%"
-            y2="100%"
+              id="modernConnectionGradient"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
           >
             <stop offset="0%" stopColor="#3b82f6" />
             <stop offset="50%" stopColor="#8b5cf6" />
@@ -118,69 +119,69 @@ export function AnimatedBackground() {
         {/* Animated connection lines with glow */}
         <g className="animate-pulse-slow" filter="url(#glow)">
           <line
-            x1="15%"
-            y1="25%"
-            x2="35%"
-            y2="45%"
-            stroke="url(#modernConnectionGradient)"
-            strokeWidth="2"
+              x1="15%"
+              y1="45%"
+              x2="35%"
+              y2="25%"
+              stroke="url(#modernConnectionGradient)"
+              strokeWidth="2"
           />
           <line
-            x1="65%"
-            y1="30%"
-            x2="80%"
-            y2="50%"
-            stroke="url(#modernConnectionGradient)"
-            strokeWidth="2"
+              x1="65%"
+              y1="50%"
+              x2="80%"
+              y2="30%"
+              stroke="url(#modernConnectionGradient)"
+              strokeWidth="2"
           />
           <line
-            x1="25%"
-            y1="70%"
-            x2="45%"
-            y2="85%"
-            stroke="url(#modernConnectionGradient)"
-            strokeWidth="2"
+              x1="25%"
+              y1="85%"
+              x2="45%"
+              y2="70%"
+              stroke="url(#modernConnectionGradient)"
+              strokeWidth="2"
           />
           <line
-            x1="60%"
-            y1="20%"
-            x2="75%"
-            y2="40%"
-            stroke="url(#modernConnectionGradient)"
-            strokeWidth="2"
+              x1="60%"
+              y1="40%"
+              x2="75%"
+              y2="20%"
+              stroke="url(#modernConnectionGradient)"
+              strokeWidth="2"
           />
           <line
-            x1="20%"
-            y1="40%"
-            x2="40%"
-            y2="60%"
-            stroke="url(#modernConnectionGradient)"
-            strokeWidth="2"
+              x1="20%"
+              y1="60%"
+              x2="40%"
+              y2="40%"
+              stroke="url(#modernConnectionGradient)"
+              strokeWidth="2"
           />
           <line
-            x1="70%"
-            y1="60%"
-            x2="85%"
-            y2="75%"
-            stroke="url(#modernConnectionGradient)"
-            strokeWidth="2"
+              x1="70%"
+              y1="75%"
+              x2="85%"
+              y2="60%"
+              stroke="url(#modernConnectionGradient)"
+              strokeWidth="2"
           />
         </g>
 
         {/* Larger, more visible connection nodes */}
         <g className="animate-pulse-slow">
-          <circle cx="15%" cy="25%" r="4" fill="#3b82f6" />
-          <circle cx="35%" cy="45%" r="4" fill="#8b5cf6" />
-          <circle cx="65%" cy="30%" r="4" fill="#3b82f6" />
-          <circle cx="80%" cy="50%" r="4" fill="#ec4899" />
-          <circle cx="25%" cy="70%" r="4" fill="#8b5cf6" />
-          <circle cx="45%" cy="85%" r="4" fill="#3b82f6" />
-          <circle cx="60%" cy="20%" r="4" fill="#ec4899" />
-          <circle cx="75%" cy="40%" r="4" fill="#8b5cf6" />
-          <circle cx="20%" cy="40%" r="4" fill="#3b82f6" />
-          <circle cx="40%" cy="60%" r="4" fill="#8b5cf6" />
-          <circle cx="70%" cy="60%" r="4" fill="#ec4899" />
-          <circle cx="85%" cy="75%" r="4" fill="#3b82f6" />
+          <circle cx="15%" cy="45%" r="4" fill="#3b82f6" />
+          <circle cx="35%" cy="25%" r="4" fill="#8b5cf6" />
+          <circle cx="65%" cy="50%" r="4" fill="#3b82f6" />
+          <circle cx="80%" cy="30%" r="4" fill="#ec4899" />
+          <circle cx="25%" cy="85%" r="4" fill="#8b5cf6" />
+          <circle cx="45%" cy="70%" r="4" fill="#3b82f6" />
+          <circle cx="60%" cy="40%" r="4" fill="#ec4899" />
+          <circle cx="75%" cy="20%" r="4" fill="#8b5cf6" />
+          <circle cx="20%" cy="60%" r="4" fill="#3b82f6" />
+          <circle cx="40%" cy="40%" r="4" fill="#8b5cf6" />
+          <circle cx="70%" cy="75%" r="4" fill="#ec4899" />
+          <circle cx="85%" cy="60%" r="4" fill="#3b82f6" />
         </g>
       </svg>
 
