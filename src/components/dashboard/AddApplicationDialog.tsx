@@ -156,22 +156,6 @@ export function AddApplicationDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes}
-              onChange={(e) =>
-                onFormChange({
-                  ...formData,
-                  notes: e.target.value,
-                })
-              }
-              placeholder="Add any notes about this application..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="applicationDate">Application date *</Label>
             <Input
               id="applicationDate"

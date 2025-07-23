@@ -25,6 +25,7 @@ export default function App() {
       setUser(JSON.parse(storedUser));
       setIsAuthenticated(true);
     }
+
   }, []);
 
   const handleLogin = (userData: any) => {
@@ -36,8 +37,10 @@ export default function App() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUser(null);
+    localStorage.removeItem('access_token');
     localStorage.removeItem("user");
   };
+
 
   const handleUserUpdate = (updatedUser: any) => {
     setUser(updatedUser);

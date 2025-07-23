@@ -123,107 +123,107 @@ export function RegistrationPage({ onLogin }: RegistrationPageProps) {
   };
 
   return (
-      <div className="max-w-md mx-auto">
-        <Card className='p-3 gap-2'>
-          <CardHeader className="text-center">
-            <CardTitle>Create Your Account</CardTitle>
-            <CardDescription className='text-sm'>
-              Join Interview Flow and start organizing your job search today
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-              )}
+    <div className="max-w-md mx-auto">
+      <Card className='p-3 gap-2'>
+        <CardHeader className="text-center">
+          <CardTitle>Create Your Account</CardTitle>
+          <CardDescription className='text-sm'>
+            Join Interview Flow and start organizing your job search today
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="username">Full Name</Label>
-                <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter your full name (2-50 characters)"
-                    required
-                    disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Min 8 chars, 1 upper, 1 lower, 1 digit, 1 special"
-                      required
-                      disabled={isLoading}
-                  />
-                  <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={isLoading}
-                  >
-                    {showPassword ? (
-                        <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                        <EyeIcon className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                    required
-                    disabled={isLoading}
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Creating Account...' : 'Create Account'}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <button
-                    onClick={() => navigate('/login')}
-                    className="text-primary hover:underline text-sm"
-                    disabled={isLoading}
-                >
-                  Login
-                </button>
-              </p>
+            <div className="space-y-2">
+              <Label htmlFor="username">Full Name</Label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your full name (2-50 characters)"
+                required
+                disabled={isLoading}
+              />
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Min 8 chars, 1 upper, 1 lower, 1 digit, 1 special"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <EyeIcon className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{' '}
+              <button
+                onClick={() => navigate('/login')}
+                className="text-primary hover:underline text-sm"
+                disabled={isLoading}
+              >
+                Login
+              </button>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -54,6 +54,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     return apiResponse.data;
   };
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -96,81 +97,81 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   };
 
   return (
-      <div className="max-w-md mx-auto">
-        <Card className='p-3 gap-2'>
-          <CardHeader className="text-center">
-            <CardTitle>Welcome Back</CardTitle>
-            <CardDescription className='text-sm'>
-              Sign in to your account to continue tracking your applications
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-              )}
+    <div className="max-w-md mx-auto">
+      <Card className='p-3 gap-2'>
+        <CardHeader className="text-center">
+          <CardTitle>Welcome Back</CardTitle>
+          <CardDescription className='text-sm'>
+            Sign in to your account to continue tracking your applications
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    disabled={isLoading}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      required
-                      disabled={isLoading}
-                  />
-                  <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={isLoading}
-                  >
-                    {showPassword ? (
-                        <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                        <EyeIcon className="h-4 w-4 text-muted-foreground" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <button
-                    onClick={() => navigate('/register')}
-                    className="text-primary hover:underline text-sm"
-                    disabled={isLoading}
-                >
-                  Register
-                </button>
-              </p>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                disabled={isLoading}
+              />
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <EyeIcon className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Don't have an account?{' '}
+              <button
+                onClick={() => navigate('/register')}
+                className="text-primary hover:underline text-sm"
+                disabled={isLoading}
+              >
+                Register
+              </button>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
