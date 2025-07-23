@@ -113,13 +113,14 @@ export function AddApplicationDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="applied">Applied</SelectItem>
-                  <SelectItem value="HR Interview">HR Screening</SelectItem>
-                  <SelectItem value="Technical Interview">Technical Interview</SelectItem>
-                  <SelectItem value="final_interview">Final Interview</SelectItem>
-                  <SelectItem value="offer">Offer</SelectItem>
-                  <SelectItem value="accepted">Accepted</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
+                  <SelectItem value="APPLIED">Applied</SelectItem>
+                  <SelectItem value="HR_SCREEN">HR Screening</SelectItem>
+                  <SelectItem value="TECHNICAL_INTERVIEW">Technical Interview</SelectItem>
+                  <SelectItem value="FINAL_INTERVIEW">Final Interview</SelectItem>
+                  <SelectItem value="OFFERED">Offer</SelectItem>
+                  <SelectItem value="ACCEPTED">Accepted</SelectItem>
+                  <SelectItem value="REJECTED">Rejected</SelectItem>
+                  <SelectItem value="WITHDRAWN">Withdrawn</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -176,9 +177,9 @@ export function AddApplicationDialog({
             />
           </div>
 
-          {["HR Interview",
-            "Technical Interview",
-            "Final Interview"].includes(formData.status) && (
+          {["HR_SCREEN",
+            "TECHNICAL_INTERVIEW",
+            "FINAL_INTERVIEW"].includes(formData.status) && (
               <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
                 <h4>Interview Details</h4>
                 <div className="space-y-2">
