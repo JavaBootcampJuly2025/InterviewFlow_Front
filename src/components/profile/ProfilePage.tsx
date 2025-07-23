@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
-import { EyeIcon, EyeOffIcon, UserIcon, KeyIcon, SaveIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, UserIcon, KeyIcon, SaveIcon, Loader2 } from 'lucide-react';
+import { userApi } from '../../utils/userApi';
 
 interface ProfilePageProps {
   user: any;
@@ -12,7 +13,7 @@ interface ProfilePageProps {
 }
 
 export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
-  const [name, setName] = useState(user?.name || '');
+  const [name, setName] = useState(user?.userName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -20,29 +21,59 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [profileError, setProfileError] = useState('');
+  const [profileSuccess, setProfileSuccess] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+    async function fetchProfile() {
+      try {
+        const profile = await userApi.getProfile();
+        if (!ignore && profile) {
+          setName(profile.userName || '');
+          setEmail(profile.email || '');
+        }
+      } catch (e) {
+        // Profile fetch failed, but we can still use the passed user data
+      } finally {
+        if (!ignore) {
+          setIsInitialLoading(false);
+        }
+      }
+    }
+    fetchProfile();
+    return () => { ignore = true; };
+  }, []);
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setSuccess('');
+    setProfileError('');
+    setProfileSuccess('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // PATCH expects { username, email }
+      const result = await userApi.changeProfile({
+        username: name,
+        email: email,
+      });
 
-      const updatedUser = {
-        ...user,
-        name: name,
-        email: email
-      };
-
-      onUserUpdate(updatedUser);
-      setSuccess('Profile updated successfully!');
+      if (result.success) {
+        const updatedUser = {
+          ...user,
+          userName: name,
+          email: email
+        };
+        onUserUpdate(updatedUser);
+        setProfileSuccess(result.message);
+      } else {
+        setProfileError(result.message);
+      }
     } catch (err) {
-      setError('Failed to update profile. Please try again.');
+      setProfileError('Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -51,41 +82,60 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setSuccess('');
+    setPasswordError('');
+    setPasswordSuccess('');
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
+      setPasswordError('New passwords do not match');
       setIsLoading(false);
       return;
     }
 
     if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters long');
+      setPasswordError('New password must be at least 6 characters long');
       setIsLoading(false);
       return;
     }
 
     if (!currentPassword) {
-      setError('Current password is required');
+      setPasswordError('Current password is required');
       setIsLoading(false);
       return;
     }
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await userApi.changePassword({
+        currentPassword,
+        newPassword,
+      });
 
-      setSuccess('Password changed successfully!');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      if (result.success) {
+        setPasswordSuccess(result.message);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setPasswordError(result.message);
+      }
     } catch (err) {
-      setError('Failed to change password. Please try again.');
+      setPasswordError('Failed to change password. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isInitialLoading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-primary" />
+            <p className="text-muted-foreground">Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -109,21 +159,26 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Separate alert for profile */}
+            {(profileError || profileSuccess) && (
+              <Alert
+                variant={profileError ? "destructive" : "success"}
+                success={!!profileSuccess}
+              >
+                <AlertDescription success={!!profileSuccess}>
+                  {profileError || profileSuccess}
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handleProfileUpdate} className="space-y-4">
-              {(error || success) && (
-                <Alert variant={error ? "destructive" : "default"}>
-                  <AlertDescription>{error || success}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+              <div className="space-y-2 mt-3">
+                <Label htmlFor="name">Username</Label>
                 <Input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder="Enter your username"
                   required
                 />
               </div>
@@ -141,7 +196,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
               </div>
 
               <Button type="submit" disabled={isLoading}>
-                <SaveIcon className="h-4 w-4 mr-2" />
+                {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <SaveIcon className="h-4 w-4 mr-2" />}
                 {isLoading ? 'Updating...' : 'Update Profile'}
               </Button>
             </form>
@@ -160,6 +215,18 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Separate alert for password */}
+            {(passwordError || passwordSuccess) && (
+              <Alert
+                variant={passwordError ? "destructive" : "success"}
+                className="mb-4"
+                success={!!passwordSuccess}
+              >
+                <AlertDescription success={!!passwordSuccess}>
+                  {passwordError || passwordSuccess}
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Current Password</Label>
@@ -224,7 +291,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
               </div>
 
               <Button type="submit" disabled={isLoading}>
-                <KeyIcon className="h-4 w-4 mr-2" />
+                {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <KeyIcon className="h-4 w-4 mr-2" />}
                 {isLoading ? 'Changing...' : 'Change Password'}
               </Button>
             </form>

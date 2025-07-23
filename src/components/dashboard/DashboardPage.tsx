@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { StatsCards } from "./StatsCards";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardTabs } from "./DashboardTabs";
@@ -105,7 +106,6 @@ export function DashboardPage({ user }: DashboardProps) {
       setApplications(transformedApplications);
 
     } catch (err) {
-      console.error('Error loading applications:', err);
       setError('Failed to load applications');
     } finally {
       setIsLoading(false);
@@ -156,7 +156,6 @@ export function DashboardPage({ user }: DashboardProps) {
       setIsAddDialogOpen(false);
 
     } catch (err) {
-      console.error('Error creating application:', err);
       setError('Failed to create application');
     }
   };
@@ -201,7 +200,6 @@ export function DashboardPage({ user }: DashboardProps) {
       setEditingApplication(null);
 
     } catch (err) {
-      console.error('Error updating application:', err);
       setError('Failed to update application');
     }
   };
@@ -217,7 +215,6 @@ export function DashboardPage({ user }: DashboardProps) {
       setApplications(applications.filter((app) => app.id !== applicationId));
 
     } catch (err) {
-      console.error('Error deleting application:', err);
       setError('Failed to delete application');
       await loadApplications();
     }
@@ -235,7 +232,10 @@ export function DashboardPage({ user }: DashboardProps) {
     return (
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex justify-center items-center h-64">
-          <p>Loading applications...</p>
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-primary" />
+            <p className="text-muted-foreground">Loading applications...</p>
+          </div>
         </div>
       </div>
     );

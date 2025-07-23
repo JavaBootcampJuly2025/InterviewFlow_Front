@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ApiResponse, LoginPageProps, LoginRequest, UserResponse } from '../../definitions/interfaces';
 
 export function LoginPage({ onLogin }: LoginPageProps) {
@@ -15,7 +15,19 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const state = location.state as { message?: string; email?: string } | null;
+    if (state?.message) {
+      setSuccessMessage(state.message);
+    }
+    if (state?.email) {
+      setEmail(state.email);
+    }
+  }, [location.state]);
 
   const loginUser = async (loginData: LoginRequest): Promise<UserResponse> => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -46,9 +58,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     if (userData.access_token) {
       localStorage.setItem('access_token', userData.access_token);
       localStorage.setItem('user', JSON.stringify(userData));
-      console.log('Token stored:', userData.access_token.substring(0, 20) + '...');
-    } else {
-      console.error('No access_token in response:', userData);
     }
 
     return apiResponse.data;
@@ -89,7 +98,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       navigate('/dashboard');
 
     } catch (err) {
-      console.error('Login error:', err);
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -107,6 +115,11 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {successMessage && (
+              <Alert variant="default" className="border-green-200 bg-green-50">
+                <AlertDescription className="text-green-800">{successMessage}</AlertDescription>
+              </Alert>
+            )}
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -154,6 +167,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>

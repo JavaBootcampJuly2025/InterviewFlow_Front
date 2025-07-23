@@ -11,6 +11,8 @@ const alertVariants = cva(
         default: "bg-card text-card-foreground",
         destructive:
           "border-pink-600/20 bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
+        success:
+          "border-green-600/20 bg-card *:data-[slot=alert-description]:text-green-700",
       },
     },
     defaultVariants: {
@@ -22,13 +24,18 @@ const alertVariants = cva(
 function Alert({
   className,
   variant,
+  success,
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
+}: React.ComponentProps<"div"> &
+  VariantProps<typeof alertVariants> & { success?: boolean }) {
   return (
     <div
       data-slot="alert"
       role="alert"
-      className={cn(alertVariants({ variant }), className)}
+      className={cn(
+        alertVariants({ variant: success ? "success" : variant }),
+        className
+      )}
       {...props}
     />
   );
@@ -49,13 +56,15 @@ function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
 
 function AlertDescription({
   className,
+  success,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { success?: boolean }) {
   return (
     <div
       data-slot="alert-description"
       className={cn(
-        "text-pink-600 col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+        "col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+        success ? "text-green-700" : "text-pink-600/90",
         className,
       )}
       {...props}
