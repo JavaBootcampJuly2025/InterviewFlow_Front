@@ -27,7 +27,6 @@ export function NotesSection({ applicationId, className = '' }: NotesSectionProp
     useEffect(() => {
         loadNotes();
     }, [applicationId]);
-    console.log('NotesSection rendered with applicationId:', applicationId);
 
     const loadNotes = async () => {
         try {

@@ -11,8 +11,6 @@ export const getAuthHeaders = (): Record<string, string> => {
 };
 
 export const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
-  console.log(`Making API request to: ${API_BASE_URL}${endpoint}`);
-
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
@@ -21,16 +19,12 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}): P
     },
   });
 
-  console.log(`Response status: ${response.status}`);
-
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
       const errorData = await response.json().catch(() => ({}));
-      // Throw error so component can handle it
       throw new Error(errorData.message || 'Unauthorized');
     }
     const errorText = await response.text();
-    console.error(`API request failed: ${response.status} ${response.statusText}`, errorText);
     throw new Error(`API request failed: ${response.statusText}`);
   }
 
@@ -39,6 +33,5 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}): P
   }
 
   const data = await response.json();
-  console.log('API response data:', data);
   return data;
 };

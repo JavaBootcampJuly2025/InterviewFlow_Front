@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '../../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { ApiResponse, RegisterRequest, RegistrationPageProps, UserResponse } from '../../definitions/interfaces';
@@ -104,18 +104,9 @@ export function RegistrationPage({ onLogin }: RegistrationPageProps) {
 
       const userData = await registerUser(registerData);
 
-      const transformedUserData = {
-        id: userData.id.toString(),
-        email: userData.email,
-        name: userData.userName,
-        userName: userData.userName,
-      };
-
-      onLogin(transformedUserData);
-      navigate('/dashboard');
+      navigate('/login', { state: { message: 'Account created successfully! Please log in.', email: email.trim() } });
 
     } catch (err) {
-      console.error('Registration error:', err);
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
@@ -206,6 +197,7 @@ export function RegistrationPage({ onLogin }: RegistrationPageProps) {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
-import { EyeIcon, EyeOffIcon, UserIcon, KeyIcon, SaveIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, UserIcon, KeyIcon, SaveIcon, Loader2 } from 'lucide-react';
 import { userApi } from '../../utils/userApi';
 
 interface ProfilePageProps {
@@ -21,6 +21,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [profileError, setProfileError] = useState('');
   const [profileSuccess, setProfileSuccess] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -36,7 +37,11 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
           setEmail(profile.email || '');
         }
       } catch (e) {
-        console.error('Failed to fetch profile:', e);
+        // Profile fetch failed, but we can still use the passed user data
+      } finally {
+        if (!ignore) {
+          setIsInitialLoading(false);
+        }
       }
     }
     fetchProfile();
@@ -119,6 +124,19 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
     }
   };
 
+  if (isInitialLoading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2 text-primary" />
+            <p className="text-muted-foreground">Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
@@ -178,7 +196,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
               </div>
 
               <Button type="submit" disabled={isLoading}>
-                <SaveIcon className="h-4 w-4 mr-2" />
+                {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <SaveIcon className="h-4 w-4 mr-2" />}
                 {isLoading ? 'Updating...' : 'Update Profile'}
               </Button>
             </form>
@@ -273,7 +291,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
               </div>
 
               <Button type="submit" disabled={isLoading}>
-                <KeyIcon className="h-4 w-4 mr-2" />
+                {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <KeyIcon className="h-4 w-4 mr-2" />}
                 {isLoading ? 'Changing...' : 'Change Password'}
               </Button>
             </form>
