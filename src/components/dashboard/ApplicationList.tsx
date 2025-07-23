@@ -97,10 +97,14 @@ export function ApplicationList({
 
   const statusOptions = [
     { value: "all", label: "All Statuses" },
-    { value: "applied", label: "Applied" },
-    { value: "interview", label: "Interview" },
-    { value: "offer", label: "Offer" },
-    { value: "rejected", label: "Rejected" },
+    { value: "APPLIED", label: "Applied" },
+    { value: "HR_SCREEN", label: "HR Screening" },
+    { value: "TECHNICAL_INTERVIEW", label: "Technical Interview" },
+    { value: "FINAL_INTERVIEW", label: "Final Interview" },
+    { value: "OFFERED", label: "Offer" },
+    { value: "ACCEPTED", label: "Accepted" },
+    { value: "REJECTED", label: "Rejected" },
+    { value: "WITHDRAWN", label: "Withdrawn" },
   ];
 
   const sortOptions = [
@@ -277,7 +281,7 @@ export function ApplicationList({
                   </div>
                 )}
 
-                {application.status === "interview" &&
+                {["HR_SCREEN", "TECHNICAL_INTERVIEW", "FINAL_INTERVIEW"].includes(application.status) &&
                   application.interviewTime && (
                     <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                       <CalendarIcon className="h-4 w-4" />

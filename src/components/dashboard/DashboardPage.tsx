@@ -27,7 +27,7 @@ export function DashboardPage({ user }: DashboardProps) {
     company: "",
     position: "",
     location: "",
-    status: "applied",
+    status: "APPLIED",
     notes: "",
     companyUrl: "",
     cvFile: "",
@@ -40,7 +40,7 @@ export function DashboardPage({ user }: DashboardProps) {
     company: "",
     position: "",
     location: "",
-    status: "applied",
+    status: "APPLIED",
     notes: "",
     companyUrl: "",
     cvFile: "",
@@ -50,30 +50,19 @@ export function DashboardPage({ user }: DashboardProps) {
   });
 
   const mapStatusToBackend = (frontendStatus: ApplicationStatus): string => {
-    const statusMap: Record<ApplicationStatus, string> = {
-      'applied': 'APPLIED',
-      'HR Interview': 'HR_SCREEN',
-      'Technical Interview': 'TECHNICAL_INTERVIEW',
-      'Final Interview': 'FINAL_INTERVIEW',
-      'offer': 'OFFERED',
-      'accepted': 'ACCEPTED',
-      'rejected': 'REJECTED'
-    };
-    return statusMap[frontendStatus] || 'APPLIED';
+    // Теперь фронтенд использует те же статусы, что и бэкенд
+    return frontendStatus;
   };
 
   const mapStatusToFrontend = (backendStatus: string): ApplicationStatus => {
-    const statusMap: Record<string, ApplicationStatus> = {
-      'APPLIED': 'applied',
-      'HR_SCREEN': 'HR Interview',
-      'TECHNICAL_INTERVIEW': 'Technical Interview',
-      'FINAL_INTERVIEW': 'Final Interview',
-      'OFFERED': 'offer',
-      'ACCEPTED': 'accepted',
-      'REJECTED': 'rejected',
-      'WITHDRAWN': 'rejected'
-    };
-    return statusMap[backendStatus] || 'applied';
+    // Теперь фронтенд использует те же статусы, что и бэкенд
+    const validStatuses: ApplicationStatus[] = [
+      "APPLIED", "HR_SCREEN", "TECHNICAL_INTERVIEW", 
+      "FINAL_INTERVIEW", "OFFERED", "ACCEPTED", "REJECTED", "WITHDRAWN"
+    ];
+    return validStatuses.includes(backendStatus as ApplicationStatus) 
+      ? backendStatus as ApplicationStatus 
+      : 'APPLIED';
   };
 
   const transformApplicationFromAPI = (dto: ApplicationListDTO): Application => {
@@ -83,7 +72,7 @@ export function DashboardPage({ user }: DashboardProps) {
       position: dto.position,
       status: mapStatusToFrontend(dto.status),
       dateApplied: dto.createdAt.split('T')[0],
-      location: "", // Not provided by backend
+      location: dto.location || "", // Now provided by backend
       notes: "", // Not provided by backend
       companyUrl: dto.companyLink || "",
       applyDate: dto.applyDate || dto.createdAt || "",
@@ -129,6 +118,7 @@ export function DashboardPage({ user }: DashboardProps) {
         companyName: newApplication.company,
         companyLink: newApplication.companyUrl || undefined,
         position: newApplication.position,
+        location: newApplication.location || undefined,
         status: mapStatusToBackend(newApplication.status),
         applyDate: ensureBackendDateTimeFormat(newApplication.applyDate) || undefined,
       };
@@ -144,7 +134,7 @@ export function DashboardPage({ user }: DashboardProps) {
         company: "",
         position: "",
         location: "",
-        status: "applied",
+        status: "APPLIED",
         notes: "",
         companyUrl: "",
         cvFile: "",
@@ -185,6 +175,7 @@ export function DashboardPage({ user }: DashboardProps) {
         companyName: editForm.company,
         companyLink: editForm.companyUrl || undefined,
         position: editForm.position,
+        location: editForm.location || undefined,
         status: mapStatusToBackend(editForm.status),
         applyDate: ensureBackendDateTimeFormat(editForm.applyDate) || undefined,
       };

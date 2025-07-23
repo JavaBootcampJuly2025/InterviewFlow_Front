@@ -1,19 +1,21 @@
 export const getStatusColor = (status: string) => {
   switch (status) {
-    case "applied":
+    case "APPLIED":
       return "bg-blue-100 text-blue-800";
-    case "HR Interview":
+    case "HR_SCREEN":
       return "bg-yellow-100 text-yellow-800";
-          case "Technical Interview":
+    case "TECHNICAL_INTERVIEW":
       return "bg-yellow-100 text-yellow-800";
-          case "Final Interview":
+    case "FINAL_INTERVIEW":
       return "bg-yellow-100 text-yellow-800";
-    case "offer":
+    case "OFFERED":
       return "bg-green-100 text-green-800";
-          case "accepted":
+    case "ACCEPTED":
       return "bg-green-100 text-green-800";
-    case "rejected":
+    case "REJECTED":
       return "bg-red-100 text-red-800";
+    case "WITHDRAWN":
+      return "bg-gray-100 text-gray-800";
     default:
       return "bg-gray-100 text-gray-800";
   }

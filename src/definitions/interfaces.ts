@@ -13,7 +13,7 @@ export interface Application {
   applyDate?: string;
 }
 
-export type ApplicationStatus = "applied" | "HR Interview" | "Technical Interview" | "Final Interview" | "offer" |  "accepted" | "rejected";
+export type ApplicationStatus = "APPLIED" | "HR_SCREEN" | "TECHNICAL_INTERVIEW" | "FINAL_INTERVIEW" | "OFFERED" | "ACCEPTED" | "REJECTED" | "WITHDRAWN";
 
 export interface ApplicationFormData {
   company: string;
@@ -36,16 +36,22 @@ export interface CreateApplicationRequest {
   companyName: string;
   companyLink?: string;
   position: string;
+  location?: string;
   status: string;
   applyDate?: string;
+  interviewDate?: string;
+  emailNotificationsEnabled?: boolean;
 }
 
 export interface UpdateApplicationRequest {
   companyName?: string;
   companyLink?: string;
   position?: string;
+  location?: string;
   status?: string;
   applyDate?: string;
+  interviewDate?: string;
+  emailNotificationsEnabled?: boolean;
 }
 
 export interface ApplicationListDTO {
@@ -54,6 +60,7 @@ export interface ApplicationListDTO {
   companyName: string;
   companyLink?: string;
   position: string;
+  location?: string;
   createdAt: string;
   updatedAt: string;
   applyDate: string;

@@ -7,19 +7,21 @@ import {
 
 export const getStatusIcon = (status: string) => {
   switch (status) {
-    case "applied":
+    case "APPLIED":
       return <ClockIcon className="h-4 w-4" />;
-    case "HR Interview":
+    case "HR_SCREEN":
       return <BriefcaseIcon className="h-4 w-4" />;
-    case "Technical Interview":
+    case "TECHNICAL_INTERVIEW":
       return <BriefcaseIcon className="h-4 w-4" />;
-    case "Final Interview":
+    case "FINAL_INTERVIEW":
       return <BriefcaseIcon className="h-4 w-4" />;
-    case "offer":
+    case "OFFERED":
       return <CheckCircleIcon className="h-4 w-4" />;
-    case "accepted":
+    case "ACCEPTED":
       return <CheckCircleIcon className="h-4 w-4" />;
-    case "rejected":
+    case "REJECTED":
+      return <XCircleIcon className="h-4 w-4" />;
+    case "WITHDRAWN":
       return <XCircleIcon className="h-4 w-4" />;
     default:
       return <ClockIcon className="h-4 w-4" />;
