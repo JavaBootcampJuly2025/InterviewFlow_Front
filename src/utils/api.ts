@@ -23,15 +23,12 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}): P
 
   console.log(`Response status: ${response.status}`);
 
-  if (response.status === 401) {
-    console.log('401 Unauthorized - clearing tokens');
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
-    window.location.href = '/login';
-    return;
-  }
-
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      const errorData = await response.json().catch(() => ({}));
+      // Throw error so component can handle it
+      throw new Error(errorData.message || 'Unauthorized');
+    }
     const errorText = await response.text();
     console.error(`API request failed: ${response.status} ${response.statusText}`, errorText);
     throw new Error(`API request failed: ${response.statusText}`);

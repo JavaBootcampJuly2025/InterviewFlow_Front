@@ -5,6 +5,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Alert, AlertDescription } from '../ui/alert';
 import { EyeIcon, EyeOffIcon, UserIcon, KeyIcon, SaveIcon } from 'lucide-react';
+import { userApi } from '../../utils/userApi';
 
 interface ProfilePageProps {
   user: any;
@@ -20,14 +21,16 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [profileError, setProfileError] = useState('');
+  const [profileSuccess, setProfileSuccess] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setSuccess('');
+    setProfileError('');
+    setProfileSuccess('');
 
     try {
       // Simulate API call
@@ -40,9 +43,9 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
       };
 
       onUserUpdate(updatedUser);
-      setSuccess('Profile updated successfully!');
+      setProfileSuccess('Profile updated successfully!');
     } catch (err) {
-      setError('Failed to update profile. Please try again.');
+      setProfileError('Failed to update profile. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -51,37 +54,44 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setSuccess('');
+    setPasswordError('');
+    setPasswordSuccess('');
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
+      setPasswordError('New passwords do not match');
       setIsLoading(false);
       return;
     }
 
     if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters long');
+      setPasswordError('New password must be at least 6 characters long');
       setIsLoading(false);
       return;
     }
 
     if (!currentPassword) {
-      setError('Current password is required');
+      setPasswordError('Current password is required');
       setIsLoading(false);
       return;
     }
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call real API
+      const result = await userApi.changePassword({
+        currentPassword,
+        newPassword,
+      });
 
-      setSuccess('Password changed successfully!');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+      if (result.success) {
+        setPasswordSuccess(result.message);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setPasswordError(result.message);
+      }
     } catch (err) {
-      setError('Failed to change password. Please try again.');
+      setPasswordError('Failed to change password. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -109,13 +119,18 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Separate alert for profile */}
+            {(profileError || profileSuccess) && (
+              <Alert
+                variant={profileError ? "destructive" : "default"}
+                success={!!profileSuccess}
+              >
+                <AlertDescription success={!!profileSuccess}>
+                  {profileError || profileSuccess}
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handleProfileUpdate} className="space-y-4">
-              {(error || success) && (
-                <Alert variant={error ? "destructive" : "default"}>
-                  <AlertDescription>{error || success}</AlertDescription>
-                </Alert>
-              )}
-
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -160,6 +175,18 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Separate alert for password */}
+            {(passwordError || passwordSuccess) && (
+              <Alert
+                variant={passwordError ? "destructive" : "default"}
+                className="mb-4"
+                success={!!passwordSuccess}
+              >
+                <AlertDescription success={!!passwordSuccess}>
+                  {passwordError || passwordSuccess}
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Current Password</Label>
