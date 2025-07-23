@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
@@ -13,7 +13,7 @@ interface ProfilePageProps {
 }
 
 export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
-  const [name, setName] = useState(user?.name || '');
+  const [name, setName] = useState(user?.userName || '');
   const [email, setEmail] = useState(user?.email || '');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -26,6 +26,23 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
+  useEffect(() => {
+    let ignore = false;
+    async function fetchProfile() {
+      try {
+        const profile = await userApi.getProfile();
+        if (!ignore && profile) {
+          setName(profile.userName || '');
+          setEmail(profile.email || '');
+        }
+      } catch (e) {
+        console.error('Failed to fetch profile:', e);
+      }
+    }
+    fetchProfile();
+    return () => { ignore = true; };
+  }, []);
+
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -33,17 +50,23 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
     setProfileSuccess('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // PATCH expects { username, email }
+      const result = await userApi.changeProfile({
+        username: name,
+        email: email,
+      });
 
-      const updatedUser = {
-        ...user,
-        name: name,
-        email: email
-      };
-
-      onUserUpdate(updatedUser);
-      setProfileSuccess('Profile updated successfully!');
+      if (result.success) {
+        const updatedUser = {
+          ...user,
+          userName: name,
+          email: email
+        };
+        onUserUpdate(updatedUser);
+        setProfileSuccess(result.message);
+      } else {
+        setProfileError(result.message);
+      }
     } catch (err) {
       setProfileError('Failed to update profile. Please try again.');
     } finally {
@@ -76,7 +99,6 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
     }
 
     try {
-      // Call real API
       const result = await userApi.changePassword({
         currentPassword,
         newPassword,
@@ -122,7 +144,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
             {/* Separate alert for profile */}
             {(profileError || profileSuccess) && (
               <Alert
-                variant={profileError ? "destructive" : "default"}
+                variant={profileError ? "destructive" : "success"}
                 success={!!profileSuccess}
               >
                 <AlertDescription success={!!profileSuccess}>
@@ -131,14 +153,14 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
               </Alert>
             )}
             <form onSubmit={handleProfileUpdate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+              <div className="space-y-2 mt-3">
+                <Label htmlFor="name">Username</Label>
                 <Input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your full name"
+                  placeholder="Enter your username"
                   required
                 />
               </div>
@@ -178,7 +200,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
             {/* Separate alert for password */}
             {(passwordError || passwordSuccess) && (
               <Alert
-                variant={passwordError ? "destructive" : "default"}
+                variant={passwordError ? "destructive" : "success"}
                 className="mb-4"
                 success={!!passwordSuccess}
               >

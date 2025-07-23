@@ -10,11 +10,31 @@ export interface ChangePasswordResult {
   message: string;
 }
 
+export interface ChangeProfilePayload {
+  username: string;
+  email: string;
+}
+
+export interface ChangeProfileResult {
+  success: boolean;
+  message: string;
+}
+
+export interface UserProfile {
+  userName: string;
+  email: string;
+}
+
 export const userApi = {
   async changePassword(payload: ChangePasswordPayload): Promise<ChangePasswordResult> {
     try {
+     const token = localStorage.getItem('access_token');
       const response = await apiRequest('/users/me/change-password', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload),
       });
 
@@ -22,7 +42,6 @@ export const userApi = {
         return { success: true, message: 'Password changed successfully!' };
       }
 
-      // If backend returns { success: false, message: ... }
       if (response && typeof response.message === 'string') {
         if (
           response.message.includes('Invalid email or password') ||
@@ -33,10 +52,8 @@ export const userApi = {
         return { success: false, message: response.message };
       }
 
-      // Fallback
       return { success: false, message: 'Failed to change password. Please try again.' };
     } catch (err: any) {
-      // Try to parse backend error message
       let msg = 'Failed to change password. Please try again.';
       if (typeof err?.message === 'string') {
         if (
@@ -55,4 +72,64 @@ export const userApi = {
       return { success: false, message: msg };
     }
   },
+
+  async changeProfile(payload: ChangeProfilePayload): Promise<ChangeProfileResult> {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await apiRequest('/users/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response && response.userName && response.email) {
+        return { success: true, message: 'Profile updated successfully!' };
+      }
+
+      if (response && typeof response.message === 'string') {
+        if (response.message.includes('Email must be valid')) {
+          return { success: false, message: 'Email must be valid.' };
+        }
+        if (response.message.includes('Username is required')) {
+          return { success: false, message: 'Username is required.' };
+        }
+        if (response.message.includes('Email is required')) {
+          return { success: false, message: 'Email is required.' };
+        }
+        return { success: false, message: response.message };
+      }
+
+      return { success: false, message: 'Failed to update profile. Please try again.' };
+    } catch (err: any) {
+      let msg = 'Failed to update profile. Please try again.';
+      if (typeof err?.message === 'string') {
+        if (err.message.includes('Email must be valid')) {
+          msg = 'Email must be valid.';
+        } else if (err.message.includes('Username is required')) {
+          msg = 'Username is required.';
+        } else if (err.message.includes('Email is required')) {
+          msg = 'Email is required.';
+        } else if (err.message.includes('Unauthorized')) {
+          msg = 'You are not authorized. Please log in again.';
+        }
+      }
+      return { success: false, message: msg };
+    }
+  },
+
+  async getProfile(): Promise<UserProfile> {
+    const token = localStorage.getItem('access_token');
+    const response = await apiRequest('/users/me', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    return response;
+  },
 };
+
