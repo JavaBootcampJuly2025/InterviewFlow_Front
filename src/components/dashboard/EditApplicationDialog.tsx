@@ -142,9 +142,16 @@ export function EditApplicationDialog({
               <Label htmlFor="edit-status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: ApplicationStatus) =>
-                  onFormChange({ ...formData, status: value })
-                }
+                onValueChange={(value: ApplicationStatus) => {
+                  const isInterviewStatus = ["HR_SCREEN", "TECHNICAL_INTERVIEW", "FINAL_INTERVIEW"].includes(value);
+                  onFormChange({
+                    ...formData,
+                    status: value,
+                    // Reset interview details if not an interview status
+                    interviewTime: isInterviewStatus ? formData.interviewTime : "",
+                    emailNotifications: isInterviewStatus ? formData.emailNotifications : false,
+                  });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -277,27 +284,34 @@ export function EditApplicationDialog({
                     id="edit-interviewTime"
                     type="datetime-local"
                     value={formData.interviewTime}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const newInterviewTime = e.target.value;
+                      const oldInterviewTime = formData.interviewTime;
+
                       onFormChange({
                         ...formData,
-                        interviewTime: e.target.value,
-                      })
-                    }
+                        interviewTime: newInterviewTime,
+                        emailNotifications: !newInterviewTime && oldInterviewTime ? false : formData.emailNotifications,
+                      });
+                    }}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="edit-emailNotifications"
                     checked={formData.emailNotifications}
-                    onCheckedChange={(checked) =>
-                      onFormChange({
+                    disabled={!formData.interviewTime}
+                    onCheckedChange={(checked) => {
+                      const newFormData = {
                         ...formData,
                         emailNotifications: checked,
-                      })
-                    }
+                      };
+
+                      onFormChange(newFormData);
+                    }}
                   />
-                  <Label htmlFor="edit-emailNotifications">
-                    Receive email notification reminders
+                  <Label htmlFor="edit-emailNotifications" className={!formData.interviewTime ? "text-muted-foreground" : ""}>
+                    Receive email notification reminders {!formData.interviewTime && "(requires interview date)"}
                   </Label>
                 </div>
               </div>

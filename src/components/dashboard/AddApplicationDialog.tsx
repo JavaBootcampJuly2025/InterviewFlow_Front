@@ -142,9 +142,15 @@ export function AddApplicationDialog({
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: ApplicationStatus) =>
-                  onFormChange({ ...formData, status: value })
-                }
+                onValueChange={(value: ApplicationStatus) => {
+                  const isInterviewStatus = ["HR_SCREEN", "TECHNICAL_INTERVIEW", "FINAL_INTERVIEW"].includes(value);
+                  onFormChange({
+                    ...formData,
+                    status: value,
+                    interviewTime: isInterviewStatus ? formData.interviewTime : "",
+                    emailNotifications: isInterviewStatus ? formData.emailNotifications : false,
+                  });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -250,18 +256,22 @@ export function AddApplicationDialog({
                     id="interviewTime"
                     type="datetime-local"
                     value={formData.interviewTime}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const newInterviewTime = e.target.value;
+                      const oldInterviewTime = formData.interviewTime;
                       onFormChange({
                         ...formData,
-                        interviewTime: e.target.value,
-                      })
-                    }
+                        interviewTime: newInterviewTime,
+                        emailNotifications: !newInterviewTime && oldInterviewTime ? false : formData.emailNotifications,
+                      });
+                    }}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="emailNotifications"
                     checked={formData.emailNotifications}
+                    disabled={!formData.interviewTime}
                     onCheckedChange={(checked) =>
                       onFormChange({
                         ...formData,
@@ -269,8 +279,8 @@ export function AddApplicationDialog({
                       })
                     }
                   />
-                  <Label htmlFor="emailNotifications">
-                    Receive email notification reminders
+                  <Label htmlFor="emailNotifications" className={!formData.interviewTime ? "text-muted-foreground" : ""}>
+                    Receive email notification reminders {!formData.interviewTime && "(requires interview date)"}
                   </Label>
                 </div>
               </div>

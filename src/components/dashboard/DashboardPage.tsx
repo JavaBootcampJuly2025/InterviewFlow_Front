@@ -71,7 +71,7 @@ export function DashboardPage({ user }: DashboardProps) {
   };
 
   const transformApplicationFromAPI = (dto: ApplicationListDTO): Application => {
-    return {
+    const result = {
       id: dto.id.toString(),
       company: dto.companyName,
       position: dto.position,
@@ -82,7 +82,11 @@ export function DashboardPage({ user }: DashboardProps) {
       companyUrl: dto.companyLink || "",
       applyDate: dto.applyDate || dto.createdAt || "",
       resumeId: dto.resumeId,
+      emailNotifications: dto.emailNotificationEnabled || false,
+      interviewTime: dto.interviewDate || "",
     };
+
+    return result;
   };
 
   useEffect(() => {
@@ -155,6 +159,8 @@ export function DashboardPage({ user }: DashboardProps) {
         location: newApplication.location || undefined,
         status: mapStatusToBackend(newApplication.status),
         applyDate: ensureBackendDateTimeFormat(newApplication.applyDate) || undefined,
+        interviewDate: newApplication.interviewTime ? ensureBackendDateTimeFormat(newApplication.interviewTime) : undefined,
+        emailNotificationsEnabled: newApplication.emailNotifications,
         resumeId: resumeId,
       };
 
@@ -249,12 +255,16 @@ export function DashboardPage({ user }: DashboardProps) {
         location: editForm.location || undefined,
         status: mapStatusToBackend(editForm.status),
         applyDate: ensureBackendDateTimeFormat(editForm.applyDate) || undefined,
+        interviewDate: editForm.interviewTime ? ensureBackendDateTimeFormat(editForm.interviewTime) : undefined,
+        emailNotificationsEnabled: editForm.emailNotifications,
         resumeId: finalResumeId,
       };
 
-      await apiRequest(`/applications/${editingApplication.id}`, {
+      const requestBody = JSON.stringify(updateRequest);
+
+      const response = await apiRequest(`/applications/${editingApplication.id}`, {
         method: 'PATCH',
-        body: JSON.stringify(updateRequest),
+        body: requestBody,
       });
 
       await loadApplications();
@@ -321,7 +331,13 @@ export function DashboardPage({ user }: DashboardProps) {
         newApplication={newApplication}
         setNewApplication={setNewApplication}
         editForm={editForm}
-        setEditForm={setEditForm}
+        setEditForm={(data) => {
+          setEditForm(
+            (prevForm) => {
+              return data;
+            }
+          );
+        }}
         onAddApplication={handleAddApplication}
         onUpdateApplication={handleUpdateApplication}
       />

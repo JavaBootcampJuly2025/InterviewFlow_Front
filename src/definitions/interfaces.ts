@@ -71,6 +71,8 @@ export interface ApplicationListDTO {
   updatedAt: string;
   applyDate: string;
   resumeId?: string;
+  emailNotificationEnabled?: boolean;
+  interviewDate?: string;
 }
 
 export interface LoginPageProps {
