@@ -8,6 +8,7 @@ export interface Application {
   notes?: string;
   companyUrl?: string;
   cvFile?: string;
+  resumeId?: string; // ID резюме в storage
   interviewTime?: string;
   emailNotifications?: boolean;
   applyDate?: string;
@@ -23,6 +24,9 @@ export interface ApplicationFormData {
   notes: string;
   companyUrl: string;
   cvFile: string;
+  cvFileObject?: File;
+  resumeId?: string;
+  resumeToDelete?: boolean;
   interviewTime: string;
   emailNotifications: boolean;
   applyDate: string;
@@ -41,6 +45,7 @@ export interface CreateApplicationRequest {
   applyDate?: string;
   interviewDate?: string;
   emailNotificationsEnabled?: boolean;
+  resumeId?: string;
 }
 
 export interface UpdateApplicationRequest {
@@ -52,6 +57,7 @@ export interface UpdateApplicationRequest {
   applyDate?: string;
   interviewDate?: string;
   emailNotificationsEnabled?: boolean;
+  resumeId?: string;
 }
 
 export interface ApplicationListDTO {
@@ -64,6 +70,7 @@ export interface ApplicationListDTO {
   createdAt: string;
   updatedAt: string;
   applyDate: string;
+  resumeId?: string;
 }
 
 export interface LoginPageProps {
@@ -98,4 +105,15 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
+}
+
+export interface ResumeResponse {
+  fileId: string;
+  fileName: string;
+  fileSize: number;
+}
+
+export interface FileResponse {
+  message: string;
+  fileId: string;
 }

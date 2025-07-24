@@ -4,6 +4,7 @@ import { StatsCards } from "./StatsCards";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardTabs } from "./DashboardTabs";
 import { apiRequest } from '../../utils/api';
+import { resumeApi } from '../../utils/resumeApi';
 import {
   Application,
   ApplicationFormData,
@@ -31,6 +32,9 @@ export function DashboardPage({ user }: DashboardProps) {
     notes: "",
     companyUrl: "",
     cvFile: "",
+    cvFileObject: undefined,
+    resumeId: undefined,
+    resumeToDelete: false,
     interviewTime: "",
     emailNotifications: false,
     applyDate: "",
@@ -44,24 +48,25 @@ export function DashboardPage({ user }: DashboardProps) {
     notes: "",
     companyUrl: "",
     cvFile: "",
+    cvFileObject: undefined,
+    resumeId: undefined,
+    resumeToDelete: false,
     interviewTime: "",
     emailNotifications: false,
     applyDate: "",
   });
 
   const mapStatusToBackend = (frontendStatus: ApplicationStatus): string => {
-    // Теперь фронтенд использует те же статусы, что и бэкенд
     return frontendStatus;
   };
 
   const mapStatusToFrontend = (backendStatus: string): ApplicationStatus => {
-    // Теперь фронтенд использует те же статусы, что и бэкенд
     const validStatuses: ApplicationStatus[] = [
-      "APPLIED", "HR_SCREEN", "TECHNICAL_INTERVIEW", 
+      "APPLIED", "HR_SCREEN", "TECHNICAL_INTERVIEW",
       "FINAL_INTERVIEW", "OFFERED", "ACCEPTED", "REJECTED", "WITHDRAWN"
     ];
-    return validStatuses.includes(backendStatus as ApplicationStatus) 
-      ? backendStatus as ApplicationStatus 
+    return validStatuses.includes(backendStatus as ApplicationStatus)
+      ? backendStatus as ApplicationStatus
       : 'APPLIED';
   };
 
@@ -72,10 +77,11 @@ export function DashboardPage({ user }: DashboardProps) {
       position: dto.position,
       status: mapStatusToFrontend(dto.status),
       dateApplied: dto.createdAt.split('T')[0],
-      location: dto.location || "", // Now provided by backend
-      notes: "", // Not provided by backend
+      location: dto.location || "",
+      notes: "",
       companyUrl: dto.companyLink || "",
       applyDate: dto.applyDate || dto.createdAt || "",
+      resumeId: dto.resumeId,
     };
   };
 
@@ -91,7 +97,23 @@ export function DashboardPage({ user }: DashboardProps) {
 
     try {
       const data = await apiRequest('/applications') as ApplicationListDTO[];
-      const transformedApplications = data.map(transformApplicationFromAPI);
+      const transformedApplications = await Promise.all(
+        data.map(async (dto) => {
+          const application = transformApplicationFromAPI(dto);
+
+          if (application.resumeId) {
+            try {
+              const resumeInfo = await resumeApi.getResumeById(application.resumeId);
+              application.cvFile = resumeInfo.fileName;
+            } catch (error) {
+              console.error('Failed to load resume info for application:', application.id, error);
+            }
+          }
+
+          return application;
+        })
+      );
+
       setApplications(transformedApplications);
 
     } catch (err) {
@@ -114,6 +136,18 @@ export function DashboardPage({ user }: DashboardProps) {
     if (!user?.id) return;
 
     try {
+      let resumeId: string | undefined = undefined;
+
+      if (newApplication.cvFileObject) {
+        try {
+          const resumeResponse = await resumeApi.uploadResume(newApplication.cvFileObject);
+          resumeId = resumeResponse.fileId;
+        } catch (resumeError) {
+          console.error('Failed to upload resume:', resumeError);
+          alert('Failed to upload resume. Application will be created without resume.');
+        }
+      }
+
       const createRequest: CreateApplicationRequest = {
         companyName: newApplication.company,
         companyLink: newApplication.companyUrl || undefined,
@@ -121,6 +155,7 @@ export function DashboardPage({ user }: DashboardProps) {
         location: newApplication.location || undefined,
         status: mapStatusToBackend(newApplication.status),
         applyDate: ensureBackendDateTimeFormat(newApplication.applyDate) || undefined,
+        resumeId: resumeId,
       };
 
       await apiRequest('/applications', {
@@ -138,6 +173,9 @@ export function DashboardPage({ user }: DashboardProps) {
         notes: "",
         companyUrl: "",
         cvFile: "",
+        cvFileObject: undefined,
+        resumeId: undefined,
+        resumeToDelete: false,
         interviewTime: "",
         emailNotifications: false,
         applyDate: "",
@@ -160,6 +198,9 @@ export function DashboardPage({ user }: DashboardProps) {
       notes: application.notes || "",
       companyUrl: application.companyUrl || "",
       cvFile: application.cvFile || "",
+      cvFileObject: undefined,
+      resumeId: application.resumeId,
+      resumeToDelete: false,
       interviewTime: application.interviewTime || "",
       emailNotifications: application.emailNotifications || false,
       applyDate: application.applyDate || "",
@@ -171,6 +212,36 @@ export function DashboardPage({ user }: DashboardProps) {
     if (!editingApplication) return;
 
     try {
+      let finalResumeId = editForm.resumeId;
+
+      if (editForm.cvFileObject) {
+        if (editForm.resumeId) {
+          try {
+            await resumeApi.deleteResume(editForm.resumeId);
+          } catch (error) {
+            console.error('Failed to delete old resume:', error);
+          }
+        }
+
+        try {
+          const resumeResponse = await resumeApi.uploadResume(editForm.cvFileObject);
+          finalResumeId = resumeResponse.fileId;
+          editForm.cvFile = resumeResponse.fileName;
+        } catch (resumeError) {
+          console.error('Failed to upload new resume:', resumeError);
+          alert('Failed to upload new resume. Application will be updated without resume change.');
+          finalResumeId = undefined;
+        }
+      }
+      else if (editForm.resumeToDelete && editForm.resumeId) {
+        try {
+          await resumeApi.deleteResume(editForm.resumeId);
+          finalResumeId = undefined;
+        } catch (error) {
+          console.error('Failed to delete resume:', error);
+        }
+      }
+
       const updateRequest: UpdateApplicationRequest = {
         companyName: editForm.company,
         companyLink: editForm.companyUrl || undefined,
@@ -178,6 +249,7 @@ export function DashboardPage({ user }: DashboardProps) {
         location: editForm.location || undefined,
         status: mapStatusToBackend(editForm.status),
         applyDate: ensureBackendDateTimeFormat(editForm.applyDate) || undefined,
+        resumeId: finalResumeId,
       };
 
       await apiRequest(`/applications/${editingApplication.id}`, {
@@ -213,10 +285,10 @@ export function DashboardPage({ user }: DashboardProps) {
 
   const stats = {
     total: applications.length,
-    applied: applications.filter((app) => app.status === "applied").length,
-    interviews: applications.filter((app) => ["HR Interview", "Technical Interview", "Final Interview"].includes(app.status)).length,
-    offers: applications.filter((app) => ["offer", "accepted"].includes(app.status)).length,
-    rejected: applications.filter((app) => app.status === "rejected").length,
+    applied: applications.filter((app) => app.status === "APPLIED").length,
+    interviews: applications.filter((app) => ["HR_SCREEN", "TECHNICAL_INTERVIEW", "FINAL_INTERVIEW"].includes(app.status)).length,
+    offers: applications.filter((app) => ["OFFERED", "ACCEPTED"].includes(app.status)).length,
+    rejected: applications.filter((app) => app.status === "REJECTED").length,
   };
 
   if (isLoading) {

@@ -17,10 +17,13 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { Switch } from "../ui/switch";
+import { TrashIcon, UploadIcon, DownloadIcon } from "lucide-react";
 import {
   ApplicationFormData,
   ApplicationStatus,
 } from "../../definitions/interfaces";
+import { useState } from "react";
+import { resumeApi } from "../../utils/resumeApi";
 
 interface EditApplicationDialogProps {
   isOpen: boolean;
@@ -37,6 +40,57 @@ export function EditApplicationDialog({
   onFormChange,
   onSubmit,
 }: EditApplicationDialogProps) {
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleFileSelect = (file: File) => {
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File size must be less than 5MB");
+      return;
+    }
+
+    if (!file.type.includes('pdf')) {
+      setUploadError("Only PDF files are supported");
+      return;
+    }
+
+    setUploadError(null);
+    onFormChange({
+      ...formData,
+      cvFile: file.name,
+      cvFileObject: file,
+    });
+  };
+
+  const handleFileRemove = () => {
+    onFormChange({
+      ...formData,
+      cvFile: "",
+      cvFileObject: undefined,
+      resumeToDelete: !!formData.resumeId,
+    });
+    setUploadError(null);
+  };
+
+  const handleDownloadResume = async () => {
+    if (!formData.resumeId || !formData.cvFile) return;
+
+    try {
+      const blob = await resumeApi.downloadResume(formData.resumeId);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = formData.cvFile;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download resume:', error);
+      alert('Failed to download resume. Please try again.');
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -122,22 +176,55 @@ export function EditApplicationDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-cvFile">CV/Resume File</Label>
-            <Input
-              id="edit-cvFile"
-              type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={(e) =>
-                onFormChange({
-                  ...formData,
-                  cvFile: e.target.files?.[0]?.name || formData.cvFile,
-                })
-              }
-            />
-            {formData.cvFile && (
-              <p className="text-sm text-muted-foreground">
-                Current file: {formData.cvFile}
-              </p>
+            <Label htmlFor="edit-cvFile">CV/Resume File (PDF only, max 5MB)</Label>
+            {!formData.cvFile ? (
+              <div>
+                <Input
+                  id="edit-cvFile"
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleFileSelect(file);
+                    }
+                  }}
+                />
+                {uploadError && (
+                  <p className="text-sm text-red-600 mt-1">{uploadError}</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between p-3 border border-gray-300 rounded-md bg-green-50">
+                <div className="flex items-center space-x-2">
+                  <UploadIcon className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">
+                    {formData.cvFile}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {formData.resumeId && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleDownloadResume}
+                      className="text-blue-600 hover:text-blue-800 h-6 w-6 p-0"
+                    >
+                      <DownloadIcon className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleFileRemove}
+                    className="text-red-600 hover:text-red-800 h-6 w-6 p-0"
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
 

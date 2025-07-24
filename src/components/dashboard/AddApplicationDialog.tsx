@@ -18,11 +18,12 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Switch } from "../ui/switch";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, TrashIcon, UploadIcon } from "lucide-react";
 import {
   ApplicationFormData,
   ApplicationStatus,
 } from "../../definitions/interfaces";
+import { useState } from "react";
 
 interface AddApplicationDialogProps {
   isOpen: boolean;
@@ -39,6 +40,42 @@ export function AddApplicationDialog({
   onFormChange,
   onSubmit,
 }: AddApplicationDialogProps) {
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleFileSelect = (file: File) => {
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("File size must be less than 5MB");
+      return;
+    }
+
+    if (!file.type.includes('pdf')) {
+      setUploadError("Only PDF files are supported");
+      return;
+    }
+
+    if (file.size === 0) {
+      setUploadError("File is empty");
+      return;
+    }
+
+    setUploadError(null);
+    onFormChange({
+      ...formData,
+      cvFile: file.name,
+      cvFileObject: file,
+    });
+  };
+
+  const handleFileRemove = () => {
+    onFormChange({
+      ...formData,
+      cvFile: "",
+      cvFileObject: undefined,
+    });
+    setUploadError(null);
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -142,18 +179,43 @@ export function AddApplicationDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cvFile">CV/Resume File</Label>
-            <Input
-              id="cvFile"
-              type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={(e) =>
-                onFormChange({
-                  ...formData,
-                  cvFile: e.target.files?.[0]?.name || "",
-                })
-              }
-            />
+            <Label htmlFor="cvFile">CV/Resume File (PDF only, max 5MB)</Label>
+            {!formData.cvFile ? (
+              <div>
+                <Input
+                  id="cvFile"
+                  type="file"
+                  accept=".pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleFileSelect(file);
+                    }
+                  }}
+                />
+                {uploadError && (
+                  <p className="text-sm text-red-600 mt-1">{uploadError}</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-between p-3 border border-gray-300 rounded-md bg-green-50">
+                <div className="flex items-center space-x-2">
+                  <UploadIcon className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">
+                    {formData.cvFile}
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleFileRemove}
+                  className="text-red-600 hover:text-red-800 h-6 w-6 p-0"
+                >
+                  <TrashIcon className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
