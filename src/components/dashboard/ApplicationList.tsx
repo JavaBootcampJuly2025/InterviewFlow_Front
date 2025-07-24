@@ -25,12 +25,14 @@ import {
   SortAscIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  DownloadIcon,
 } from "lucide-react";
 import { Application } from "../../definitions/interfaces";
 import { getStatusIcon } from "../../utils/statusIcons";
 import { getStatusColor } from "../../utils/applicationUtils";
 import { useState, useMemo } from "react";
 import { NotesSection } from '../notes/NotesSection';
+import { resumeApi } from "../../utils/resumeApi";
 
 interface ApplicationListProps {
   applications: Application[];
@@ -48,6 +50,23 @@ export function ApplicationList({
   const [sortBy, setSortBy] = useState<string>("dateApplied");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [expandedApplications, setExpandedApplications] = useState<Set<string>>(new Set());
+
+  const handleDownloadResume = async (resumeId: string, fileName: string) => {
+    try {
+      const blob = await resumeApi.downloadResume(resumeId);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download resume:', error);
+      alert('Failed to download resume. Please try again.');
+    }
+  };
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = applications.filter((app) => {
@@ -133,8 +152,8 @@ export function ApplicationList({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col sm:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-          <div className="flex-1">
+        <div className="flex flex-col lg:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="flex-1 min-w-0">
             <Input
               placeholder="Search by position, company, or location..."
               value={searchTerm}
@@ -142,13 +161,13 @@ export function ApplicationList({
               className="w-full"
             />
           </div>
-          <div className="flex gap-2 hover:cursor-pointer">
+          <div className="flex flex-wrap gap-2 justify-start sm:justify-end hover:cursor-pointer">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40 hover:cursor-pointer">
+              <SelectTrigger className="w-full sm:w-52 hover:cursor-pointer">
                 <FilterIcon className="h-4 w-4 mr-2 hover:cursor-pointer" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-full sm:w-52">
                 {statusOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -158,11 +177,11 @@ export function ApplicationList({
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-40 hover:cursor-pointer">
+              <SelectTrigger className="w-full sm:w-44 hover:cursor-pointer">
                 <SortAscIcon className="h-4 w-4 mr-2 hover:cursor-pointer" />
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-full sm:w-44">
                 {sortOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -177,7 +196,7 @@ export function ApplicationList({
               onClick={() =>
                 setSortOrder(sortOrder === "asc" ? "desc" : "asc")
               }
-              className="px-3"
+              className="px-3 w-12 sm:w-auto"
             >
               {sortOrder === "asc" ? "↑" : "↓"}
             </Button>
@@ -216,6 +235,21 @@ export function ApplicationList({
                     <p className="text-sm text-muted-foreground">
                       {application.location}
                     </p>
+                    {application.cvFile && application.resumeId && (
+                      <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-1">
+                        <FileTextIcon className="h-4 w-4" />
+                        <span>CV: {application.cvFile}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDownloadResume(application.resumeId!, application.cvFile!)}
+                          className="h-6 px-2 text-blue-600 hover:text-blue-800"
+                        >
+                          <DownloadIcon className="h-4 w-4 mr-1" />
+                          Download
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="text-sm text-muted-foreground">
@@ -271,13 +305,6 @@ export function ApplicationList({
                 {application.notes && (
                   <div className="text-sm text-muted-foreground">
                     <strong>Notes:</strong> {application.notes}
-                  </div>
-                )}
-
-                {application.cvFile && (
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <FileTextIcon className="h-4 w-4" />
-                    <span>CV: {application.cvFile}</span>
                   </div>
                 )}
 

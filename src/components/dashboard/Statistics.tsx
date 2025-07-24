@@ -30,8 +30,8 @@ interface StatisticsProps {
 export function Statistics({ stats }: StatisticsProps) {
   const chartData = [
     { name: "Applied", value: stats.applied, color: "#3b82f6" },
-    { name: "Interview", value: stats.interviews, color: "#f59e0b" },
-    { name: "Offer", value: stats.offers, color: "#10b981" },
+    { name: "Interviews", value: stats.interviews, color: "#f59e0b" },
+    { name: "Offers", value: stats.offers, color: "#10b981" },
     { name: "Rejected", value: stats.rejected, color: "#ef4444" },
   ].filter((item) => item.value > 0);
 
@@ -85,7 +85,7 @@ export function Statistics({ stats }: StatisticsProps) {
                 <span className="font-semibold">{stats.applied}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-yellow-50 rounded-lg">
-                <span>Interview Stage</span>
+                <span>Interview Stages</span>
                 <span className="font-semibold">{stats.interviews}</span>
               </div>
               <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
