@@ -152,7 +152,7 @@ export function ApplicationList({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col lg:flex-row gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+        <div className="flex flex-col space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
           <div className="flex-1 min-w-0">
             <Input
               placeholder="Search by position, company, or location..."
@@ -161,7 +161,7 @@ export function ApplicationList({
               className="w-full"
             />
           </div>
-          <div className="flex flex-wrap gap-2 justify-start sm:justify-end hover:cursor-pointer">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-52 hover:cursor-pointer">
                 <FilterIcon className="h-4 w-4 mr-2 hover:cursor-pointer" />
@@ -176,30 +176,33 @@ export function ApplicationList({
               </SelectContent>
             </Select>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-full sm:w-44 hover:cursor-pointer">
-                <SortAscIcon className="h-4 w-4 mr-2 hover:cursor-pointer" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="w-full sm:w-44">
-                {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="flex-1 sm:w-44 hover:cursor-pointer">
+                  <SortAscIcon className="h-4 w-4 mr-2 hover:cursor-pointer" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="w-full sm:w-44">
+                  {sortOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-              }
-              className="px-3 w-12 sm:w-auto"
-            >
-              {sortOrder === "asc" ? "↑" : "↓"}
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
+                className="px-3 w-auto shrink-0"
+                title={`Sort ${sortOrder === "asc" ? "Descending" : "Ascending"}`}
+              >
+                {sortOrder === "asc" ? "↑" : "↓"}
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -214,36 +217,36 @@ export function ApplicationList({
                 key={application.id}
                 className="p-4 border rounded-lg space-y-3"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2">
-                      <h3 className="font-medium">{application.position}</h3>
+                      <h3 className="font-medium truncate">{application.position}</h3>
                       {application.companyUrl && (
                         <a
                           href={application.companyUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
+                          className="text-blue-600 hover:text-blue-800 transition-colors shrink-0"
                         >
                           <ExternalLinkIcon className="h-4 w-4" />
                         </a>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground truncate">
                       {application.company}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground truncate">
                       {application.location}
                     </p>
                     {application.cvFile && application.resumeId && (
                       <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-1">
                         <FileTextIcon className="h-4 w-4" />
-                        <span>CV: {application.cvFile}</span>
+                        <span className="truncate">CV: {application.cvFile}</span>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDownloadResume(application.resumeId!, application.cvFile!)}
-                          className="h-6 px-2 text-blue-600 hover:text-blue-800"
+                          className="h-6 px-2 text-blue-600 hover:text-blue-800 shrink-0"
                         >
                           <DownloadIcon className="h-4 w-4 mr-1" />
                           Download
@@ -251,25 +254,29 @@ export function ApplicationList({
                       </div>
                     )}
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-sm text-muted-foreground">
-                      Applied:{" "}
-                      {new Date(application.dateApplied).toLocaleDateString()}
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                    <div className="flex flex-col sm:items-end">
+                      <div className="text-sm text-muted-foreground">
+                        Applied: {new Date(application.dateApplied).toLocaleDateString()}
+                      </div>
+                      <Badge
+                        className={`${getStatusColor(
+                          application.status
+                        )} flex items-center space-x-1 w-fit mt-1`}
+                      >
+                        {getStatusIcon(application.status)}
+                        <span className="capitalize">{application.status.replace('_', ' ')}</span>
+                      </Badge>
                     </div>
-                    <Badge
-                      className={`${getStatusColor(
-                        application.status
-                      )} flex items-center space-x-1`}
-                    >
-                      {getStatusIcon(application.status)}
-                      <span className="capitalize">{application.status}</span>
-                    </Badge>
+
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onEdit(application)}
                         className="h-8 w-8 p-0"
+                        title="Edit application"
                       >
                         <EditIcon className="h-4 w-4" />
                       </Button>
@@ -278,6 +285,7 @@ export function ApplicationList({
                         size="sm"
                         onClick={() => onDelete(application.id)}
                         className="h-8 w-8 p-0 text-red-600 hover:text-red-800"
+                        title="Delete application"
                       >
                         <TrashIcon className="h-4 w-4" />
                       </Button>
@@ -286,7 +294,7 @@ export function ApplicationList({
                         size="sm"
                         onClick={() => toggleApplicationExpanded(application.id)}
                         className="h-8 w-8 p-0"
-                        aria-label={
+                        title={
                           expandedApplications.has(application.id)
                             ? "Collapse notes"
                             : "Expand notes"
@@ -303,21 +311,22 @@ export function ApplicationList({
                 </div>
 
                 {application.notes && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground break-words">
                     <strong>Notes:</strong> {application.notes}
                   </div>
                 )}
 
                 {["HR_SCREEN", "TECHNICAL_INTERVIEW", "FINAL_INTERVIEW"].includes(application.status) &&
                   application.interviewTime && (
-                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                      <CalendarIcon className="h-4 w-4" />
-                      <span>
-                        Interview:{" "}
-                        {new Date(application.interviewTime).toLocaleString()}
-                      </span>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center space-x-2">
+                        <CalendarIcon className="h-4 w-4" />
+                        <span>
+                          Interview: {new Date(application.interviewTime).toLocaleString()}
+                        </span>
+                      </div>
                       {application.emailNotifications && (
-                        <Badge variant="secondary">Notifications ON</Badge>
+                        <Badge variant="secondary" className="w-fit">Notifications ON</Badge>
                       )}
                     </div>
                   )}

@@ -73,15 +73,15 @@ export function Logo({ className = "", onClick, isFooter }: LogoProps) {
             </div>
 
             <div className="flex flex-col group-hover:scale-105 transition-all duration-300">
-                <div className="flex items-baseline space-x-1 transition-transform duration-300 ">
-                    <p className="text-m font-bold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent ">
+                <div className="flex items-baseline space-x-1 transition-transform duration-300">
+                    <p className="text-sm sm:text-base font-bold bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 bg-clip-text text-transparent">
                         Interview
                     </p>
-                    <p className="text-m font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-pink-400 bg-clip-text text-transparent transition-all duration-300">
+                    <p className="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-pink-400 bg-clip-text text-transparent transition-all duration-300">
                         Flow
                     </p>
                 </div>
-                {!isFooter && <div className="text-[8px] text-muted-foreground font-medium tracking-wider uppercase opacity-75 transition-opacity duration-300 min-w-[100px]">
+                {!isFooter && <div className="text-[6px] sm:text-[8px] text-muted-foreground font-medium tracking-wider uppercase opacity-75 transition-opacity duration-300 min-w-[80px] sm:min-w-[100px]">
                     Track &amp; Succeed
                 </div>}
             </div>

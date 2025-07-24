@@ -49,10 +49,10 @@ export function Statistics({ stats }: StatisticsProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           <div>
-            <h3 className="mb-4">Status Distribution</h3>
-            <ResponsiveContainer width="100%" height={320}>
+            <h3 className="mb-4 text-sm lg:text-base font-medium">Status Distribution</h3>
+            <ResponsiveContainer width="100%" height={isTablet ? 280 : 320}>
               <PieChart>
                 <Pie
                   data={chartData}
@@ -62,7 +62,7 @@ export function Statistics({ stats }: StatisticsProps) {
                   label={({ name, percent }) =>
                     `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
                   }
-                  outerRadius={isTablet ? 70 : 90}
+                  outerRadius={isTablet ? 60 : 90}
                   fill="#8884d8"
                   dataKey="value"
                   className={isTablet ? "text-xs" : "text-sm"}

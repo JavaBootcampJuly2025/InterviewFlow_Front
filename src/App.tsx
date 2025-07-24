@@ -8,6 +8,7 @@ import { ProfilePage } from "./components/profile/ProfilePage";
 import { Header } from "./components/header/Header";
 import { Footer } from "./components/footer/Footer";
 import { AnimatedBackground } from "./components/background/AnimatedBackground";
+import { ResponsiveTest } from "./components/ui/responsive-test";
 import { getStoredAuthData, clearAuthData } from "./utils/authUtils";
 import { Loader2 } from "lucide-react";
 import "./globals.css";
@@ -78,7 +79,7 @@ export default function App() {
             isAuthenticated={isAuthenticated}
             onLogout={handleLogout}
           />
-          <main className="container mx-auto px-4 py-8 flex-1">
+          <main className="container mx-auto px-4 py-6 sm:py-8 flex-1">
             <Routes>
               {!isAuthenticated ? (<Route path="/" element={<HomePage />} />) : (<Route
                 path="/"

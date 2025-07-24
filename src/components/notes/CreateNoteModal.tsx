@@ -65,7 +65,6 @@ export function CreateNoteModal({ isOpen, onClose, applicationId, onNoteCreated 
 
             onNoteCreated(newNote);
 
-            // Reset form
             setTitle('');
             setContent('');
             setTags([]);

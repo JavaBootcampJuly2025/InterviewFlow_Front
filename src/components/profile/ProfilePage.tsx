@@ -37,7 +37,6 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
           setEmail(profile.email || '');
         }
       } catch (e) {
-        // Profile fetch failed, but we can still use the passed user data
       } finally {
         if (!ignore) {
           setIsInitialLoading(false);
@@ -55,7 +54,6 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
     setProfileSuccess('');
 
     try {
-      // PATCH expects { username, email }
       const result = await userApi.changeProfile({
         username: name,
         email: email,
@@ -138,19 +136,19 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1>Profile Management</h1>
-        <p className="text-muted-foreground">
+    <div className="max-w-4xl mx-auto space-y-6 px-4">
+      <div className="text-center sm:text-left">
+        <h1 className="text-2xl sm:text-3xl font-bold">Profile Management</h1>
+        <p className="text-muted-foreground mt-1">
           Manage your account settings and preferences
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         {/* Profile Information */}
-        <Card className="py-2 gap-2">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+        <Card className="py-2 gap-2 order-1">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center space-x-2 text-lg">
               <UserIcon className="h-5 w-5" />
               <span>Profile Information</span>
             </CardTitle>
@@ -164,6 +162,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
               <Alert
                 variant={profileError ? "destructive" : "success"}
                 success={!!profileSuccess}
+                className="mb-4"
               >
                 <AlertDescription success={!!profileSuccess}>
                   {profileError || profileSuccess}
@@ -171,7 +170,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
               </Alert>
             )}
             <form onSubmit={handleProfileUpdate} className="space-y-4">
-              <div className="space-y-2 mt-3">
+              <div className="space-y-2">
                 <Label htmlFor="name">Username</Label>
                 <Input
                   id="name"
@@ -180,6 +179,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your username"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -192,10 +192,11 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <SaveIcon className="h-4 w-4 mr-2" />}
                 {isLoading ? 'Updating...' : 'Update Profile'}
               </Button>
@@ -205,7 +206,7 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
 
         {/* Password Change */}
         <Card className="py-2 gap-2">
-          <CardHeader>
+          <CardHeader className="pb-4">
             <CardTitle className="flex items-center space-x-2">
               <KeyIcon className="h-5 w-5" />
               <span>Change Password</span>
@@ -238,11 +239,13 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    disabled={isLoading}
                   >
                     {showCurrentPassword ? (
                       <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
@@ -263,11 +266,13 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password"
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                     onClick={() => setShowNewPassword(!showNewPassword)}
+                    disabled={isLoading}
                   >
                     {showNewPassword ? (
                       <EyeOffIcon className="h-4 w-4 text-muted-foreground" />
@@ -287,10 +292,11 @@ export function ProfilePage({ user, onUserUpdate }: ProfilePageProps) {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <KeyIcon className="h-4 w-4 mr-2" />}
                 {isLoading ? 'Changing...' : 'Change Password'}
               </Button>

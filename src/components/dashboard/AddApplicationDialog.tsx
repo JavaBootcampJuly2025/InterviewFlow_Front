@@ -1,7 +1,6 @@
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
 import {
   Select,
   SelectContent,
@@ -84,15 +83,15 @@ export function AddApplicationDialog({
           Add Application
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Add New Application</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-2xl max-h-[95vh] overflow-y-auto mx-4 sm:mx-0">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-lg sm:text-xl">Add New Application</DialogTitle>
+          <DialogDescription className="text-sm">
             Track a new job application you've submitted.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="company">Company *</Label>
               <Input
@@ -123,7 +122,7 @@ export function AddApplicationDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
               <Input
@@ -142,9 +141,15 @@ export function AddApplicationDialog({
               <Label htmlFor="status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: ApplicationStatus) =>
-                  onFormChange({ ...formData, status: value })
-                }
+                onValueChange={(value: ApplicationStatus) => {
+                  const isInterviewStatus = ["HR_SCREEN", "TECHNICAL_INTERVIEW", "FINAL_INTERVIEW"].includes(value);
+                  onFormChange({
+                    ...formData,
+                    status: value,
+                    interviewTime: isInterviewStatus ? formData.interviewTime : "",
+                    emailNotifications: isInterviewStatus ? formData.emailNotifications : false,
+                  });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -243,42 +248,49 @@ export function AddApplicationDialog({
             "TECHNICAL_INTERVIEW",
             "FINAL_INTERVIEW"].includes(formData.status) && (
               <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
-                <h4>Interview Details</h4>
+                <h4 className="font-medium">Interview Details</h4>
                 <div className="space-y-2">
                   <Label htmlFor="interviewTime">Interview Date & Time</Label>
                   <Input
                     id="interviewTime"
                     type="datetime-local"
                     value={formData.interviewTime}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const newInterviewTime = e.target.value;
+                      const oldInterviewTime = formData.interviewTime;
                       onFormChange({
                         ...formData,
-                        interviewTime: e.target.value,
-                      })
-                    }
+                        interviewTime: newInterviewTime,
+                        emailNotifications: !newInterviewTime && oldInterviewTime ? false : formData.emailNotifications,
+                      });
+                    }}
                   />
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-start space-x-2">
                   <Switch
                     id="emailNotifications"
                     checked={formData.emailNotifications}
+                    disabled={!formData.interviewTime}
                     onCheckedChange={(checked) =>
                       onFormChange({
                         ...formData,
                         emailNotifications: checked,
                       })
                     }
+                    className="mt-1"
                   />
-                  <Label htmlFor="emailNotifications">
-                    Receive email notification reminders
+                  <Label htmlFor="emailNotifications" className={`text-sm leading-relaxed ${!formData.interviewTime ? "text-muted-foreground" : ""}`}>
+                    Receive email notification reminders {!formData.interviewTime && "(requires interview date)"}
                   </Label>
                 </div>
               </div>
             )}
 
-          <Button onClick={onSubmit} className="w-full">
-            Add Application
-          </Button>
+          <div className="pt-4 border-t">
+            <Button onClick={onSubmit} className="w-full" size="lg">
+              Add Application
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

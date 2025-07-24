@@ -1,7 +1,6 @@
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
 import {
   Select,
   SelectContent,
@@ -93,15 +92,15 @@ export function EditApplicationDialog({
   };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit Application</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-2xl max-h-[95vh] overflow-y-auto mx-4 sm:mx-0">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-lg sm:text-xl">Edit Application</DialogTitle>
+          <DialogDescription className="text-sm">
             Update your job application details.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="edit-company">Company *</Label>
               <Input
@@ -126,7 +125,7 @@ export function EditApplicationDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="edit-location">Location</Label>
               <Input
@@ -142,9 +141,15 @@ export function EditApplicationDialog({
               <Label htmlFor="edit-status">Status</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value: ApplicationStatus) =>
-                  onFormChange({ ...formData, status: value })
-                }
+                onValueChange={(value: ApplicationStatus) => {
+                  const isInterviewStatus = ["HR_SCREEN", "TECHNICAL_INTERVIEW", "FINAL_INTERVIEW"].includes(value);
+                  onFormChange({
+                    ...formData,
+                    status: value,
+                    interviewTime: isInterviewStatus ? formData.interviewTime : "",
+                    emailNotifications: isInterviewStatus ? formData.emailNotifications : false,
+                  });
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -229,19 +234,6 @@ export function EditApplicationDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-notes">Notes</Label>
-            <Textarea
-              id="edit-notes"
-              value={formData.notes}
-              onChange={(e) =>
-                onFormChange({ ...formData, notes: e.target.value })
-              }
-              placeholder="Add any notes about this application..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="edit-applicationDate">Application date *</Label>
             <Input
               id="edit-applicationDate"
@@ -277,35 +269,45 @@ export function EditApplicationDialog({
                     id="edit-interviewTime"
                     type="datetime-local"
                     value={formData.interviewTime}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const newInterviewTime = e.target.value;
+                      const oldInterviewTime = formData.interviewTime;
+
                       onFormChange({
                         ...formData,
-                        interviewTime: e.target.value,
-                      })
-                    }
+                        interviewTime: newInterviewTime,
+                        emailNotifications: !newInterviewTime && oldInterviewTime ? false : formData.emailNotifications,
+                      });
+                    }}
                   />
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-start space-x-2">
                   <Switch
                     id="edit-emailNotifications"
                     checked={formData.emailNotifications}
-                    onCheckedChange={(checked) =>
-                      onFormChange({
+                    disabled={!formData.interviewTime}
+                    onCheckedChange={(checked) => {
+                      const newFormData = {
                         ...formData,
                         emailNotifications: checked,
-                      })
-                    }
+                      };
+
+                      onFormChange(newFormData);
+                    }}
+                    className="mt-1"
                   />
-                  <Label htmlFor="edit-emailNotifications">
-                    Receive email notification reminders
+                  <Label htmlFor="edit-emailNotifications" className={`text-sm leading-relaxed ${!formData.interviewTime ? "text-muted-foreground" : ""}`}>
+                    Receive email notification reminders {!formData.interviewTime && "(requires interview date)"}
                   </Label>
                 </div>
               </div>
             )}
 
-          <Button onClick={onSubmit} className="w-full">
-            Update Application
-          </Button>
+          <div className="pt-4 border-t">
+            <Button onClick={onSubmit} className="w-full" size="lg">
+              Update Application
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

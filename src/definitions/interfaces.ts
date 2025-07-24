@@ -8,7 +8,7 @@ export interface Application {
   notes?: string;
   companyUrl?: string;
   cvFile?: string;
-  resumeId?: string; // ID резюме в storage
+  resumeId?: string;
   interviewTime?: string;
   emailNotifications?: boolean;
   applyDate?: string;
@@ -71,6 +71,8 @@ export interface ApplicationListDTO {
   updatedAt: string;
   applyDate: string;
   resumeId?: string;
+  emailNotificationEnabled?: boolean;
+  interviewDate?: string;
 }
 
 export interface LoginPageProps {
