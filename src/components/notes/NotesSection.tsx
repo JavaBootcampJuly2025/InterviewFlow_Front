@@ -76,7 +76,6 @@ export function NotesSection({ applicationId, className = '' }: NotesSectionProp
         });
     };
 
-    // Функция для выбора цвета на основе значения тега
     const tagColors = [
         "bg-blue-100 text-blue-800",
         "bg-green-100 text-green-800",
@@ -89,7 +88,6 @@ export function NotesSection({ applicationId, className = '' }: NotesSectionProp
         "bg-indigo-100 text-indigo-800",
     ];
     function getTagColor(tag: string) {
-        // Простая хеш-функция для выбора цвета по тегу
         let hash = 0;
         for (let i = 0; i < tag.length; i++) {
             hash = tag.charCodeAt(i) + ((hash << 5) - hash);

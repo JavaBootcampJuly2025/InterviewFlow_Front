@@ -8,7 +8,7 @@ export interface Application {
   notes?: string;
   companyUrl?: string;
   cvFile?: string;
-  resumeId?: string; // ID резюме в storage
+  resumeId?: string;
   interviewTime?: string;
   emailNotifications?: boolean;
   applyDate?: string;

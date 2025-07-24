@@ -11,7 +11,6 @@ export interface Note {
 }
 
 export const notesApi = {
-  // Get all notes for a specific application
   async getNotesByApplicationId(applicationId: string): Promise<Note[]> {
     const data = await apiRequest(`/notes?applicationId=${encodeURIComponent(applicationId)}`);
     return data.map((note: any) => ({
@@ -29,7 +28,6 @@ export const notesApi = {
     }));
   },
 
-  // Create a new note
   async createNote(noteData: { applicationId: string; content: string, title: string, tags: string[] }): Promise<Note> {
     const payload = {
       applicationId: Number(noteData.applicationId),
@@ -48,11 +46,10 @@ export const notesApi = {
       createdAt: note.createdAt,
       updatedAt: note.updatedAt,
       title: note.title || '',
-      tags: note.tags || [],  
+      tags: note.tags || [],
     };
   },
 
-  // Delete a note
   async deleteNote(id: string): Promise<void> {
     await apiRequest(`/notes/${id}`, {
       method: 'DELETE',

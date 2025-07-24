@@ -2,15 +2,12 @@ export const isTokenValid = (token: string): boolean => {
   if (!token) return false;
   
   try {
-    // Basic token format validation
     const parts = token.split('.');
     if (parts.length !== 3) return false;
     
-    // Decode the payload to check expiration
     const payload = JSON.parse(atob(parts[1]));
     const now = Date.now() / 1000;
     
-    // Check if token is expired
     if (payload.exp && payload.exp < now) {
       return false;
     }
